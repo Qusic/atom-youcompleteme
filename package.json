@@ -1,17 +1,15 @@
 {
   "name": "you-complete-me",
   "main": "./lib/ycm",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "YouCompleteMe for Atom Editor",
   "repository": "https://github.com/Qusic/atom-youcompleteme",
   "license": "MIT",
   "engines": {
     "atom": ">=0.177.0"
   },
-  "dependencies": {
-  },
-  "devDependencies": {
-  },
+  "dependencies": {},
+  "devDependencies": {},
   "providedServices": {
     "autocomplete.provider": {
       "versions": {
