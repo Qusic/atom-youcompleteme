@@ -20,3 +20,5 @@ module.exports =
         text: completion.insertion_text
         replacementPrefix: prefix
         rightLabel: completion.extra_menu_info
+      .catch (error) ->
+        console.log '[YCM-ERROR]', error
