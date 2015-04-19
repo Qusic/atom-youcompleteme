@@ -55,7 +55,7 @@ module.exports =
           ycmdPath
           "--port=#{@port}"
           "--options_file=#{optionsFile}"
-          '--idle_suicide_seconds=10800'
+          '--idle_suicide_seconds=600'
         ]
         options: {}
         stderr: (output) -> console.log '[YCM]', output
