@@ -78,42 +78,53 @@ module.exports =
     else
       @prepare()
 
-  request: (method, endpoint, parameters = null) -> @prepareIfNecessary().then => new Promise (fulfill, reject) =>
-    createHmac = (data) =>
-      new Buffer(crypto.createHmac('sha256', @hmacSecret).update(data).digest('hex')).toString 'base64'
-    verifyHmac = (data, hmac) ->
-      secureCompare createHmac(data), hmac
+  request: (method, endpoint, parameters = null) -> @prepareIfNecessary().then =>
+    generateHmac = (data, encoding) =>
+      crypto.createHmac('sha256', @hmacSecret).update(data).digest(encoding)
+    verifyHmac = (data, hmac, encoding) ->
+      secureCompare generateHmac(data, encoding), hmac
     secureCompare = (string1, string2) ->
       return false unless typeof string1 is 'string' and typeof string2 is 'string'
       return false unless string1.length is string2.length
-      return createHmac(string1) is createHmac(string2)
-    options =
-      hostname: 'localhost'
-      port: @port
-      method: method
-      path: url.resolve '/', endpoint
-      headers: {}
-    isPost = method is 'POST'
-    postData = ''
-    if isPost
-      postData = JSON.stringify parameters if parameters?
-      options.headers['Content-Type'] = 'application/json'
-      options.headers['Content-Length'] = postData.length
-    else
-      options.path += "?#{querystring.stringify parameters}" if parameters?
-    options.headers['X-Ycm-Hmac'] = createHmac postData
-    request = http.request options, (response) ->
-      response.setEncoding 'utf8'
-      data = ''
-      response.on 'data', (chunk) -> data += chunk
-      response.on 'end', () ->
-        if verifyHmac data, response.headers['x-ycm-hmac']
-          fulfill JSON.parse data
+      return Buffer.compare(generateHmac(string1), generateHmac(string2)) is 0
+    signRequest = (request, data) ->
+      request.headers['X-Ycm-Hmac'] = generateHmac Buffer.concat([generateHmac(request.method), generateHmac(request.path), generateHmac(data)]), 'base64'
+    verifyResponse = (response, data) ->
+      verifyHmac data, response.headers['x-ycm-hmac'], 'base64'
+    Promise.resolve()
+      .then () =>
+        options =
+          hostname: 'localhost'
+          port: @port
+          method: method
+          path: url.resolve '/', endpoint
+          headers: {}
+        isPost = method is 'POST'
+        postData = ''
+        if isPost
+          postData = JSON.stringify parameters if parameters?
+          options.headers['Content-Type'] = 'application/json'
+          options.headers['Content-Length'] = postData.length
         else
-          reject new Error 'Bad Hmac'
-    request.on 'error', (error) -> reject error
-    request.write postData if isPost
-    request.end()
+          options.path += "?#{querystring.stringify parameters}" if parameters?
+        signRequest options, postData
+        return [options, isPost, postData]
+      .then ([options, isPost, postData]) -> new Promise (fulfill, reject) ->
+        request = http.request options, (response) ->
+          response.setEncoding 'utf8'
+          data = ''
+          response.on 'data', (chunk) -> data += chunk
+          response.on 'end', () ->
+            if verifyResponse response, data
+              object = JSON.parse data
+              console.log '[YCM-REQUEST]', method, endpoint, parameters
+              console.log '[YCM-RESPONSE]', object
+              fulfill object
+            else
+              reject new Error 'Bad Hmac'
+        request.on 'error', (error) -> reject error
+        request.write postData if isPost
+        request.end()
 
   # API Endpoints:
   #
