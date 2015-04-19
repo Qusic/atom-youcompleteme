@@ -126,6 +126,8 @@ module.exports =
         request.on 'error', (error) -> reject error
         request.write postData if isPost
         request.end()
+      .catch (error) ->
+        console.log '[YCM-ERROR]', error
 
   # API Endpoints:
   #

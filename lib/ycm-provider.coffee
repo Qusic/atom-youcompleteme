@@ -1,6 +1,6 @@
-fs = require 'fs'
 os = require 'os'
 path = require 'path'
+{File} = require 'atom'
 
 module.exports =
   handler: require './ycm-handler'
@@ -19,11 +19,10 @@ module.exports =
         else
           return new Promise (fulfill, reject) ->
             filepath = path.resolve os.tmpdir(), "AtomYcmBuffer-#{editor.id}"
-            fs.writeFile filepath, contents, encoding: 'utf8', (error) ->
-              unless error?
-                fulfill [filepath, contents, filetypes]
-              else
-                reject error
+            file = new File filepath
+            file.write(contents)
+              .then () -> fulfill [filepath, contents, filetypes]
+              .catch (error) -> reject error
       .then ([filepath, contents, filetypes]) ->
         parameters =
           line_num: bufferPosition.row + 1
