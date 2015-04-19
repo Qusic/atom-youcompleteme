@@ -58,7 +58,7 @@ module.exports =
           '--idle_suicide_seconds=600'
         ]
         options: {}
-        stderr: (output) -> console.log '[YCM]', output
+        stderr: (output) -> console.log '[YCM-CONSOLE]', output
         exit: (status) => @ycmdProcess = null
       fulfill()
     Promise.all [findUnusedPort, generateRandomSecret, readDefaultOptions]
