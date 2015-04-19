@@ -58,6 +58,7 @@ module.exports =
           '--idle_suicide_seconds=600'
         ]
         options: {}
+        stdout: (output) -> console.log '[YCM-CONSOLE]', output
         stderr: (output) -> console.log '[YCM-CONSOLE]', output
         exit: (status) => @ycmdProcess = null
       fulfill()
