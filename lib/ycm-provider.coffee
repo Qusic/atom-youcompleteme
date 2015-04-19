@@ -11,26 +11,28 @@ module.exports =
   getSuggestions: ({editor, bufferPosition, scopeDescriptor}) ->
     Promise.resolve()
       .then () ->
-        filepath = editor.buffer.file?.path
+        filepath = editor.getPath()
+        contents = editor.getText()
+        filetypes = scopeDescriptor.getScopesArray().map (scope) -> scope.split('.').pop()
         if filepath?
-          return filepath
+          return [filepath, contents, filetypes]
         else
           return new Promise (fulfill, reject) ->
             filepath = path.resolve os.tmpdir(), "AtomYcmBuffer-#{editor.id}"
-            fs.writeFile filepath, editor.buffer.cachedText, encoding: 'utf8', (error) ->
+            fs.writeFile filepath, contents, encoding: 'utf8', (error) ->
               unless error?
-                fulfill filepath
+                fulfill [filepath, contents, filetypes]
               else
                 reject error
-      .then (filepath) ->
+      .then ([filepath, contents, filetypes]) ->
         parameters =
           line_num: bufferPosition.row + 1
           column_num: bufferPosition.column + 1
           filepath: filepath
           file_data: {}
-        parameters.file_data[parameters.filepath] =
-          filetypes: scopeDescriptor.scopes.map (scope) -> scope.split('.').pop()
-          contents: editor.buffer.cachedText
+        parameters.file_data[filepath] =
+          contents: contents
+          filetypes: filetypes
         return parameters
       .then (parameters) =>
         @handler.request('POST', 'completions', parameters).then (response) ->
