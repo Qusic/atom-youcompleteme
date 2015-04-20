@@ -4,13 +4,10 @@
 
 ## Previews
 
-![](https://cloud.githubusercontent.com/assets/2141853/6558574/e2a020ca-c6b7-11e4-9da2-d8254af39ab1.png)
-
-![](https://cloud.githubusercontent.com/assets/2141853/6558575/e2a64824-c6b7-11e4-9d7b-f9a3545562d8.png)
-
-## Features
-
-This package is at the early development stage and still primitive and experimental. Though semantic completion of python is more usable than that of C-family languages.
+![](https://cloud.githubusercontent.com/assets/2141853/7228908/61ce58be-e790-11e4-967c-72884b50234e.png)
+![](https://cloud.githubusercontent.com/assets/2141853/7228950/e1b39e0e-e790-11e4-866b-eea3e9d7ae0e.png)
+![](https://cloud.githubusercontent.com/assets/2141853/7228947/cae4cc7a-e790-11e4-9542-3c1d94af6a07.png)
+![](https://cloud.githubusercontent.com/assets/2141853/7228894/3555f788-e790-11e4-826a-5608d21ab94a.png)
 
 ## Usage
 
