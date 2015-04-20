@@ -92,6 +92,16 @@ module.exports =
       request.headers['X-Ycm-Hmac'] = generateHmac Buffer.concat([generateHmac(request.method), generateHmac(request.path), generateHmac(data)]), 'base64'
     verifyResponse = (response, data) ->
       verifyHmac data, response.headers['x-ycm-hmac'], 'base64'
+    unicodeEscaper = (key, value) ->
+      if typeof value is 'string'
+        escapedString = ''
+        for i in [0...value.length]
+          char = value.charAt i
+          charCode = value.charCodeAt i
+          escapedString += if charCode < 0x80 then char else "\\u#{"0000#{charCode.toString 16}".substr -4}"
+        return escapedString
+      else
+        return value
     Promise.resolve()
       .then () =>
         options =
@@ -103,7 +113,7 @@ module.exports =
         isPost = method is 'POST'
         postData = ''
         if isPost
-          postData = JSON.stringify parameters if parameters?
+          postData = JSON.stringify parameters, unicodeEscaper if parameters?
           options.headers['Content-Type'] = 'application/json'
           options.headers['Content-Length'] = postData.length
         else
