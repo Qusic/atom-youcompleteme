@@ -11,17 +11,21 @@
 
 ## Usage
 
-1. **Install [Ycmd](https://github.com/Valloric/ycmd)**
+### 1. **Install [Qusic/ycmd](https://github.com/Qusic/ycmd)**
 
-   If you have installed YouCompleteMe plugin for vim, then you do not have to install it.
+You have to use this fork of ycmd. The original ycmd used by the vim plugin will not work.
 
-2. **Configure Settings**
+It is necessary for all the awesome features because the upstream does not merge pull requests quickly enough or some changes are specific to Atom client.
 
-   * Python Executable<br />
-     full path to your python intepreter
+For instructions on building ycmd, see [YouCompleteMe's README](https://github.com/Valloric/YouCompleteMe/blob/master/README.md#installation).
 
-   * Ycmd Path<br />
-     if you have the vim plugin, you can simply use `/home/.vim/bundle/YouCompleteMe/third_party/ycmd`
+### 2. **Configure Settings**
 
-   * Global Extra Config<br />
-     the .ycm_extra_conf.py file
+* Python Executable<br />
+Full path to your python intepreter.
+
+* Ycmd Path<br />
+Full path to your ycmd installation.
+
+* Global Extra Config<br />
+The default .ycm_extra_conf.py file.
