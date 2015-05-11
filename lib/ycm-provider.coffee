@@ -4,7 +4,7 @@ path = require 'path'
 
 module.exports =
   handler: require './ycm-handler'
-  selector: '*'
+  selector: '.source.c, .source.cpp, .source.objc, .source.objcpp, .source.python'
   inclusionPriority: 1
   excludeLowerPriority: true
 
