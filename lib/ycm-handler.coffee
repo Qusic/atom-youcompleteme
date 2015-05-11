@@ -139,20 +139,23 @@ module.exports =
 
   # API Endpoints:
   #
-  # isReady: () -> @request 'GET', 'ready'
-  # isHealthy: () -> @request 'GET', 'healthy'
+  # GET /ready
+  # GET /healthy
   #
-  # isSemanticCompletionAvailable: () -> @request 'POST', 'semantic_completion_available'
-  # getCompletions: () -> @request 'POST', 'completions'
-  # getDetailedDiagnostic: () -> @request 'POST', 'detailed_diagnostic'
-  # sendEventNotification: () -> @request 'POST', 'event_notification'
+  # POST /semantic_completion_available
+  # POST /completions
+  # POST /detailed_diagnostic
+  # POST /event_notification
   #
-  # getDefinedSubcommands: () -> @request 'POST', 'defined_subcommands'
-  # runCompleterCommand: () -> @request 'POST', 'run_completer_command'
+  # POST /defined_subcommands
+  # POST /run_completer_command
   #
-  # getUserOptions: () -> @request 'GET', 'user_options'
-  # setUserOptions: () -> @request 'POST', 'user_options'
-  # loadExtraConfFile: () -> @request 'POST', 'load_extra_conf_file'
-  # ignoreExtraConfFile: () -> @request 'POST', 'ignore_extra_conf_file'
+  # GET /user_options
+  # POST /user_options
+  # POST /load_extra_conf_file
+  # POST /ignore_extra_conf_file
   #
-  # getDebugInfo: () -> @request 'POST', 'debug_info'
+  # POST /debug_info
+  #
+  # Only available on Qusic's ycmd fork:
+  # POST /atom_completions
