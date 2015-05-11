@@ -58,8 +58,8 @@ module.exports =
           '--idle_suicide_seconds=600'
         ]
         options: {}
-        stdout: (output) -> console.log '[YCM-CONSOLE]', output
-        stderr: (output) -> console.log '[YCM-CONSOLE]', output
+        stdout: (output) -> console.debug '[YCM-CONSOLE]', output
+        stderr: (output) -> console.debug '[YCM-CONSOLE]', output
         exit: (status) => @ycmdProcess = null
       fulfill()
     Promise.all [findUnusedPort, generateRandomSecret, readDefaultOptions]
@@ -128,16 +128,14 @@ module.exports =
           response.on 'end', () ->
             if verifyResponse response, data
               object = JSON.parse data
-              console.log '[YCM-REQUEST]', method, endpoint, parameters
-              console.log '[YCM-RESPONSE]', object
+              console.debug '[YCM-REQUEST]', method, endpoint, parameters
+              console.debug '[YCM-RESPONSE]', object
               fulfill object
             else
               reject new Error 'Bad Hmac'
         request.on 'error', (error) -> reject error
         request.write postData if isPost
         request.end()
-      .catch (error) ->
-        console.log '[YCM-ERROR]', error
 
   # API Endpoints:
   #

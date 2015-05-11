@@ -84,4 +84,4 @@ module.exports =
       .then @processContext.bind this
       .then @fetchCompletions.bind this
       .then @convertCompletions.bind this
-      .catch (error) -> console.log '[YCM-ERROR]', error
+      .catch (error) -> console.error '[YCM-ERROR]', error
