@@ -4,7 +4,7 @@ process = require 'process'
 
 ycmd =
   repo: 'https://github.com/Qusic/ycmd.git'
-  commit: '4992a48b5e26e0a6263cd20597869c790edc567c'
+  commit: 'f24d7f68bcd54aa56bff5ef5113278e0b9be0b56'
   root_dir: __dirname
   ycmd_dir: path.resolve __dirname, 'ycmd'
 
@@ -16,6 +16,9 @@ ycmd =
 
   clone: () ->
     result = @spawn 'git', ['clone', @repo], @root_dir
+    return result.status is 0
+  pull: () ->
+    result = @spawn 'git', ['pull'], @ycmd_dir
     return result.status is 0
   checkout: () ->
     result = @spawn 'git', ['checkout', @commit], @ycmd_dir
@@ -32,7 +35,7 @@ ycmd =
     '''], @ycmd_dir
     return if result.status is 0 then result.stdout else null
 
-unless ycmd.checkout() or (ycmd.remove() and ycmd.clone() and ycmd.checkout())
+unless (ycmd.pull() and ycmd.checkout()) or (ycmd.remove() and ycmd.clone() and ycmd.checkout())
   console.error 'Failed to fetch ycmd from github.'
   process.exit 1
 
