@@ -47,20 +47,20 @@ module.exports =
         else
           reject error
     launchServer = (optionsFile) => new Promise (fulfill, reject) =>
-      pythonExecutable = path.resolve atom.config.get 'you-complete-me.pythonExecutable'
-      ycmdPath = path.resolve atom.config.get('you-complete-me.ycmdPath'), 'ycmd'
-      @ycmdProcess = new BufferedProcess
-        command: pythonExecutable
+      parameters =
+        command: 'python'
         args: [
-          ycmdPath
+          path.resolve @ycmdPath, 'ycmd'
           "--port=#{@port}"
           "--options_file=#{optionsFile}"
           '--idle_suicide_seconds=600'
         ]
         options: {}
-        stdout: (output) -> console.debug '[YCM-CONSOLE]', output
-        stderr: (output) -> console.debug '[YCM-CONSOLE]', output
         exit: (status) => @ycmdProcess = null
+      if atom.inDevMode()
+        parameters.stdout = (output) -> console.debug '[YCM-CONSOLE]', output
+        parameters.stderr = (output) -> console.debug '[YCM-CONSOLE]', output
+      @ycmdProcess = new BufferedProcess parameters
       fulfill()
     Promise.all [findUnusedPort, generateRandomSecret, readDefaultOptions]
       .then processData
@@ -128,8 +128,9 @@ module.exports =
           response.on 'end', () ->
             if verifyResponse response, data
               object = JSON.parse data
-              console.debug '[YCM-REQUEST]', method, endpoint, parameters
-              console.debug '[YCM-RESPONSE]', object
+              if atom.inDevMode()
+                console.debug '[YCM-REQUEST]', method, endpoint, parameters
+                console.debug '[YCM-RESPONSE]', object
               fulfill object
             else
               reject new Error 'Bad Hmac'
