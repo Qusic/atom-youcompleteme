@@ -31,9 +31,10 @@ module.exports =
     parameters.file_data[filepath] =
       contents: contents
       filetypes: filetypes
-    @handler.request('POST', 'completions', parameters).then (response) ->
-      completions = response.completions
-      prefix = editor.getTextInBufferRange [[bufferPosition.row, response.completion_start_column - 1], bufferPosition]
+    @handler.request('POST', 'atom_completions', parameters).then (response) ->
+      completions = response?.completions or []
+      startColumn = (response?.completion_start_column or (bufferPosition.column + 1)) - 1
+      prefix = editor.getTextInBufferRange [[bufferPosition.row, startColumn], bufferPosition]
       return {completions, prefix, filetypes}
 
   convertCompletions: ({completions, prefix, filetypes}) ->
