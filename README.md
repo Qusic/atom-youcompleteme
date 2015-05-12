@@ -19,7 +19,8 @@ apm install you-complete-me
 cd ~/.atom/packages/you-complete-me/ycmd
 
 # Build ycmd
-./build.py --clang-completer
+git submodule update --init --recursive
+./build.py --clang-completer --omnisharp-completer --gocode-completer
 ```
 
 You may notice that this package uses a fork of ycmd instead of the original one. It is necessary for all the awesome features because the upstream does not merge pull requests quickly enough or some essential changes are specific to Atom client and will not be merged into the upstream.
