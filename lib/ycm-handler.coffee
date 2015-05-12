@@ -9,6 +9,7 @@ url = require 'url'
 {BufferedProcess} = require 'atom'
 
 module.exports =
+  ycmdPath: path.resolve atom.packages.resolvePackagePath('you-complete-me'), 'ycmd'
   ycmdProcess: null
   port: null
   hmacSecret: null
@@ -28,8 +29,8 @@ module.exports =
           fulfill data
         else
           reject error
-    readDefaultOptions = new Promise (fulfill, reject) ->
-      defaultOptionsFile = path.resolve atom.config.get('you-complete-me.ycmdPath'), 'ycmd', 'default_settings.json'
+    readDefaultOptions = new Promise (fulfill, reject) =>
+      defaultOptionsFile = path.resolve @ycmdPath, 'ycmd', 'default_settings.json'
       fs.readFile defaultOptionsFile, encoding: 'utf8', (error, data) ->
         unless error?
           fulfill JSON.parse data
