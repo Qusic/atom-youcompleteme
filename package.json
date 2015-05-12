@@ -16,5 +16,8 @@
         "2.0.0": "provide"
       }
     }
+  },
+  "scripts": {
+    "prepublish": "coffee ycmd.coffee"
   }
 }
