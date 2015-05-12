@@ -38,16 +38,27 @@ module.exports =
       return {completions, prefix, filetypes}
 
   convertCompletions: ({completions, prefix, filetypes}) ->
-    convertFunctions =
+    converters =
       general: (completion) ->
-        text: completion.insertion_text
+        snippet: (
+          placeholderIndex = 1
+          completion.completion_parts
+            .map (part) -> if part.literal then part.part else "${#{placeholderIndex++}:#{part.part}}"
+            .join ''
+        )
+        displayText: completion.display_string
         replacementPrefix: prefix
-        rightLabel: completion.extra_menu_info
-        description: completion.detailed_info
-      clang: (completion) ->
-        text: completion.insertion_text
-        replacementPrefix: prefix
+        leftLabel: completion.result_type
+        rightLabel: completion.kind
+        description: completion.doc_string
         type: (
+          switch completion.kind
+            when '[File]', '[Dir]', '[File&Dir]' then 'import'
+            else null
+        )
+      clang: (completion) ->
+        suggestion = converters.general completion
+        suggestion.type = (
           switch completion.kind
             when 'TYPE', 'STRUCT', 'ENUM' then 'type'
             when 'CLASS' then 'class'
@@ -57,28 +68,24 @@ module.exports =
             when 'MACRO' then 'constant'
             when 'NAMESPACE' then 'keyword'
             when 'UNKNOWN' then 'value'
-            else null
+            else suggestion.type
         )
-        leftLabel: completion.extra_menu_info
-        rightLabel: completion.kind
-        description: completion.detailed_info
+        return suggestion
       python: (completion) ->
-        text: completion.insertion_text
-        replacementPrefix: prefix
-        type: completion.extra_menu_info.substr(0, (completion.extra_menu_info.indexOf ': '))
-        rightLabel: completion.extra_menu_info.substr((completion.extra_menu_info.indexOf ': ') + 2)
-        description: completion.detailed_info
-    completionType = switch filetypes[0]
-      when 'c', 'cpp', 'objc', 'objcpp' then 'clang'
-      when 'python' then 'python'
-      else 'general'
-    completions.map (completion) ->
-      suggestion = convertFunctions[completionType](completion)
+        suggestion = converters.general completion
+        suggestion.type = completion.display_string.substr(0, (completion.display_string.indexOf ': '))
+        return suggestion
+    formatter = (suggestion) ->
       if suggestion.leftLabel?.length > 20
         suggestion.leftLabel = "#{suggestion.leftLabel.substr 0, 20}…"
-      if suggestion.leftLabel is '[File]' or suggestion.leftLabel is '[Dir]'
-        suggestion.type ?= 'import'
       return suggestion
+    converter = converters[(
+      switch filetypes[0]
+        when 'c', 'cpp', 'objc', 'objcpp' then 'clang'
+        when 'python' then 'python'
+        else 'general'
+    )]
+    completions.map (completion) -> formatter converter completion
 
   getSuggestions: (context) ->
     Promise.resolve context
