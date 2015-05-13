@@ -6,7 +6,7 @@ module.exports =
   handler: require './ycm-handler'
   selector: '.source.c, .source.cpp, .source.objc, .source.objcpp, .source.python'
   inclusionPriority: 1
-  excludeLowerPriority: true
+  excludeLowerPriority: false
 
   processContext: ({editor, bufferPosition, scopeDescriptor}) ->
     filepath = editor.getPath()
