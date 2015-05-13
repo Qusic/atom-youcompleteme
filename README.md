@@ -19,7 +19,6 @@ apm install you-complete-me
 cd ~/.atom/packages/you-complete-me/ycmd
 
 # Build ycmd
-git submodule update --init --recursive
 ./build.py --clang-completer --omnisharp-completer --gocode-completer
 ```
 

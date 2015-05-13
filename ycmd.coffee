@@ -17,11 +17,14 @@ ycmd =
   clone: () ->
     result = @spawn 'git', ['clone', @repo], @root_dir
     return result.status is 0
-  pull: () ->
-    result = @spawn 'git', ['pull'], @ycmd_dir
+  fetch: () ->
+    result = @spawn 'git', ['fetch'], @ycmd_dir
     return result.status is 0
   checkout: () ->
     result = @spawn 'git', ['checkout', @commit], @ycmd_dir
+    return result.status is 0
+  submodule: () ->
+    result = @spawn 'git', ['submodule', 'update', '--init', '--recursive'], @ycmd_dir
     return result.status is 0
   remove: () ->
     result = @spawn 'rm', ['-rf', @ycmd_dir]
@@ -35,7 +38,7 @@ ycmd =
     '''], @ycmd_dir
     return if result.status is 0 then result.stdout else null
 
-unless (ycmd.pull() and ycmd.checkout()) or (ycmd.remove() and ycmd.clone() and ycmd.checkout())
+unless (ycmd.fetch() or (ycmd.remove() and ycmd.clone())) and ycmd.checkout() and ycmd.submodule()
   console.error 'Failed to fetch ycmd from github.'
   process.exit 1
 
