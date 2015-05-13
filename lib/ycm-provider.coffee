@@ -56,6 +56,7 @@ module.exports =
             when '[File]', '[Dir]', '[File&Dir]' then 'import'
             else null
         )
+
       clang: (completion) ->
         suggestion = converters.general completion
         suggestion.type = (
@@ -71,20 +72,24 @@ module.exports =
             else suggestion.type
         )
         return suggestion
+
       python: (completion) ->
         suggestion = converters.general completion
         suggestion.type = completion.display_string.substr(0, (completion.display_string.indexOf ': '))
         return suggestion
+
     formatter = (suggestion) ->
       if suggestion.leftLabel?.length > 20
         suggestion.leftLabel = "#{suggestion.leftLabel.substr 0, 20}…"
       return suggestion
+
     converter = converters[(
       switch filetypes[0]
         when 'c', 'cpp', 'objc', 'objcpp' then 'clang'
         when 'python' then 'python'
         else 'general'
     )]
+
     completions.map (completion) -> formatter converter completion
 
   getSuggestions: (context) ->

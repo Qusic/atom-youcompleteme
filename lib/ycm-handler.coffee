@@ -23,12 +23,14 @@ module.exports =
           fulfill port
         .on 'error', (error) ->
           reject error
+
     generateRandomSecret = new Promise (fulfill, reject) ->
       crypto.randomBytes 16, (error, data) ->
         unless error?
           fulfill data
         else
           reject error
+
     readDefaultOptions = new Promise (fulfill, reject) =>
       defaultOptionsFile = path.resolve @ycmdPath, 'ycmd', 'default_settings.json'
       fs.readFile defaultOptionsFile, encoding: 'utf8', (error, data) ->
@@ -36,6 +38,7 @@ module.exports =
           fulfill JSON.parse data
         else
           reject error
+
     processData = ([port, hmacSecret, options]) => new Promise (fulfill, reject) =>
       @port = port
       @hmacSecret = hmacSecret
@@ -47,6 +50,7 @@ module.exports =
           fulfill optionsFile
         else
           reject error
+
     launchServer = (optionsFile) => new Promise (fulfill, reject) =>
       parameters =
         command: 'python'
@@ -63,6 +67,7 @@ module.exports =
         parameters.stderr = (output) -> console.debug '[YCM-CONSOLE]', output
       @ycmdProcess = new BufferedProcess parameters
       fulfill()
+
     Promise.all [findUnusedPort, generateRandomSecret, readDefaultOptions]
       .then processData
       .then launchServer
@@ -83,16 +88,21 @@ module.exports =
   request: (method, endpoint, parameters = null) -> @prepareIfNecessary().then =>
     generateHmac = (data, encoding) =>
       crypto.createHmac('sha256', @hmacSecret).update(data).digest(encoding)
+
     verifyHmac = (data, hmac, encoding) ->
       secureCompare generateHmac(data, encoding), hmac
+
     secureCompare = (string1, string2) ->
       return false unless typeof string1 is 'string' and typeof string2 is 'string'
       return false unless string1.length is string2.length
       return Buffer.compare(generateHmac(string1), generateHmac(string2)) is 0
+
     signRequest = (request, data) ->
       request.headers['X-Ycm-Hmac'] = generateHmac Buffer.concat([generateHmac(request.method), generateHmac(request.path), generateHmac(data)]), 'base64'
+
     verifyResponse = (response, data) ->
       verifyHmac data, response.headers['x-ycm-hmac'], 'base64'
+
     unicodeEscaper = (key, value) ->
       if typeof value is 'string'
         escapedString = ''
@@ -103,6 +113,7 @@ module.exports =
         return escapedString
       else
         return value
+
     Promise.resolve()
       .then () =>
         options =
@@ -121,6 +132,7 @@ module.exports =
           options.path += "?#{querystring.stringify parameters}" if parameters?
         signRequest options, postData
         return [options, isPost, postData]
+
       .then ([options, isPost, postData]) -> new Promise (fulfill, reject) ->
         request = http.request options, (response) ->
           response.setEncoding 'utf8'
