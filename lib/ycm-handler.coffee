@@ -53,7 +53,7 @@ module.exports =
 
     launchServer = (optionsFile) => new Promise (fulfill, reject) =>
       parameters =
-        command: 'python'
+        command: atom.config.get 'you-complete-me.pythonExecutable'
         args: [
           path.resolve @ycmdPath, 'ycmd'
           "--port=#{@port}"
