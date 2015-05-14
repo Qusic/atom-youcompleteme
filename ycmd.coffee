@@ -1,3 +1,5 @@
+#!/usr/bin/env coffee
+
 child_process = require 'child_process'
 path = require 'path'
 process = require 'process'
