@@ -4,10 +4,8 @@
 
 ## Previews
 
-![](https://cloud.githubusercontent.com/assets/2141853/7228908/61ce58be-e790-11e4-967c-72884b50234e.png)
-![](https://cloud.githubusercontent.com/assets/2141853/7228950/e1b39e0e-e790-11e4-866b-eea3e9d7ae0e.png)
-![](https://cloud.githubusercontent.com/assets/2141853/7228947/cae4cc7a-e790-11e4-9542-3c1d94af6a07.png)
-![](https://cloud.githubusercontent.com/assets/2141853/7228894/3555f788-e790-11e4-826a-5608d21ab94a.png)
+![](https://cloud.githubusercontent.com/assets/2141853/7626423/79024212-fa3b-11e4-941e-e014a8e5b0df.gif)
+![](https://cloud.githubusercontent.com/assets/2141853/7626422/7901f352-fa3b-11e4-8007-82ab514fb8e9.gif)
 
 ## Usage
 
