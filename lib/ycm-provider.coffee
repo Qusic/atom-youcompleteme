@@ -42,8 +42,8 @@ module.exports =
       general: (completion) ->
         snippet: (
           placeholderIndex = 1
-          completion.completion_parts
-            .map (part) -> if part.literal then part.part else "${#{placeholderIndex++}:#{part.part}}"
+          completion.completion_chunks
+            .map (chunk) -> if chunk.placeholder then "${#{placeholderIndex++}:#{chunk.chunk}}" else chunk.chunk
             .join ''
         )
         displayText: completion.display_string

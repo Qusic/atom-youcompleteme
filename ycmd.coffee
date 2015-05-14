@@ -4,7 +4,7 @@ process = require 'process'
 
 ycmd =
   repo: 'https://github.com/Qusic/ycmd.git'
-  commit: 'f24d7f68bcd54aa56bff5ef5113278e0b9be0b56'
+  commit: 'ed958ea203e651942a346725a0194118969ac398'
   root_dir: __dirname
   ycmd_dir: path.resolve __dirname, 'ycmd'
 
