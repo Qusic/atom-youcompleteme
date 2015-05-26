@@ -43,7 +43,19 @@ module.exports =
       @port = port
       @hmacSecret = hmacSecret
       options.hmac_secret = hmacSecret.toString 'base64'
-      options.global_ycm_extra_conf = atom.config.get 'you-complete-me.globalExtraConfig'
+      globalConf = atom.config.get 'you-complete-me.globalExtraConfig'
+      if globalConf
+          # use provided
+          options.global_ycm_extra_conf = globalConf
+      else
+          # use default project/.ycm_extra_conf.py
+          projPath = atom.project.getPaths()[0]
+          if projPath
+              options.global_ycm_extra_conf = path.join(atom.project.getPaths()[0], '.ycm_extra_conf.py')
+          else
+              # no project, no luck
+              options.global_ycm_extra_conf = ''
+
       optionsFile = path.resolve os.tmpdir(), "AtomYcmOptions-#{Date.now()}"
       fs.writeFile optionsFile, JSON.stringify(options), encoding: 'utf8', (error) ->
         unless error?
