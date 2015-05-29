@@ -1,15 +1,21 @@
+handler = require './handler'
+provider = require './provider'
+config = require './config'
+configObserver = null
+
+activate = ->
+  configObserver = atom.config.observe 'you-complete-me', -> handler.reset()
+  handler.prepare()
+
+deactivate = ->
+  configObserver?.dispose()
+  handler.reset()
+
+provide = ->
+  provider
+
 module.exports =
-  handler: require './ycm-handler'
-  provider: require './ycm-provider'
-  config: require './ycm-config'
-
-  activate: ->
-    @configObserver = atom.config.observe 'you-complete-me', => @handler.reset()
-    @handler.prepare()
-
-  deactivate: ->
-    @configObserver?.dispose()
-    @handler.reset()
-
-  provide: ->
-    @provider
+  config: config
+  activate: () -> activate()
+  deactivate: () -> deactivate()
+  provide: () -> provider
