@@ -33,7 +33,7 @@
         "level": "error"
     },
     "line_endings": {
-        "level": "error",
+        "level": "ignore",
         "value": "unix"
     },
     "max_line_length": {
