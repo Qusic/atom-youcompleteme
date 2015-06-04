@@ -1,4 +1,4 @@
-handler: require './handler'
+handler = require './handler'
 
 loadExtraConfig = (context) ->
 
