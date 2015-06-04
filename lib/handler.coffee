@@ -8,6 +8,8 @@ querystring = require 'querystring'
 url = require 'url'
 {BufferedProcess} = require 'atom'
 
+debug = require './debug'
+
 ycmdPath = path.resolve atom.packages.resolvePackagePath('you-complete-me'), 'ycmd'
 ycmdProcess = null
 port = null
@@ -61,9 +63,8 @@ launch = ->
       ]
       options: {}
       exit: (status) -> ycmdProcess = null
-    if atom.inDevMode()
-      parameters.stdout = (output) -> console.debug '[YCM-CONSOLE]', output
-      parameters.stderr = (output) -> console.debug '[YCM-CONSOLE]', output
+    parameters.stdout = (output) -> debug.log 'CONSOLE', output
+    parameters.stderr = (output) -> debug.log 'CONSOLE', output
     ycmdProcess = new BufferedProcess parameters
     fulfill()
 
@@ -140,9 +141,8 @@ request = (method, endpoint, parameters = null) -> prepare().then ->
         responseMessage.on 'end', () ->
           if verifyMessage responseMessage, responsePayload
             responseObject = JSON.parse responsePayload
-            if atom.inDevMode()
-              console.debug '[YCM-REQUEST]', method, endpoint, parameters
-              console.debug '[YCM-RESPONSE]', responseObject
+            debug.log 'REQUEST', method, endpoint, parameters
+            debug.log 'RESPONSE', responseObject
             fulfill responseObject
           else
             reject new Error 'Bad Hmac'
@@ -174,6 +174,6 @@ request = (method, endpoint, parameters = null) -> prepare().then ->
 # POST /atom_completions
 
 module.exports =
-  prepare: () -> prepare()
-  reset: () -> reset()
-  request: (method, endpoint, parameters) -> request(method, endpoint, parameters)
+  prepare: prepare
+  reset: reset
+  request: request
