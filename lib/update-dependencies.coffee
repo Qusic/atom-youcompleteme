@@ -9,7 +9,7 @@ packagePath = path.resolve atom.packages.resolvePackagePath('you-complete-me')
 dependencies = [{
   name: 'ycmd'
   repo: 'https://github.com/Qusic/ycmd.git'
-  commit: 'ed958ea203e651942a346725a0194118969ac398'
+  commit: '5796f7d3bccd7050384c4cc710845351bcd416e2'
   extraCheck: (dependencyPath) ->
     versionScript = '''
       from sys import stdout
