@@ -62,7 +62,7 @@ updateDependency = ({name, repo, commit, extraCheck, extraWarning}) ->
     fetch = -> spawn 'git', ['fetch'], dependencyPath
     checkout = -> spawn 'git', ['checkout', commit], dependencyPath
     submodule = -> spawn 'git', ['submodule', 'update', '--init', '--recursive'], dependencyPath
-    remove: ->
+    remove = ->
       if process.platform is 'win32'
         spawn('rmdir', ['/s', '/q', dependencyPath]).catch (error) ->
       else
