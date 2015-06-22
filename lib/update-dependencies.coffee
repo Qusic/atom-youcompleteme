@@ -70,9 +70,9 @@ updateDependency = ({name, repo, commit, extraCheck, extraWarning}) ->
     Promise.resolve()
       .then fetch
       .catch ->
-        Promise.resolve
+        Promise.resolve()
           .then remove
-          .them clone
+          .then clone
       .then checkout
       .then submodule
 
