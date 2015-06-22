@@ -11,7 +11,7 @@
 
 ```
 # Install the package
-# Open Atom and it will download ycmd automatically.
+# Open Atom and it will download ycmd automatically from Github. Depending on your Internet connection, it may take several minutes.
 
 # Build C++ components of ycmd
 # Sometimes you have to rebuild them after upgrading the package.
