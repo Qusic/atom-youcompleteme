@@ -96,7 +96,7 @@ updateDependency = ({name, repo, commit, extraCheck, extraWarning}) ->
             else
               throw new Error 'Update check failed.'
     .catch (error) ->
-      atom.notifications.addError "[YCM] Failed to update #{name}.", detail: error.message
+      atom.notifications.addError "[YCM] Failed to update #{name}.", detail: "#{error.message}\n#{error.stack}"
 
 updateDependencies = ->
   Promise.all(updateDependency dependency for dependency in dependencies)
