@@ -6,8 +6,7 @@ updateDependencies = require './update-dependencies'
 configObserver = null
 
 activate = ->
-  configObserver = atom.config.observe 'you-complete-me', -> handler.reset()
-  handler.prepare()
+  configObserver = atom.config.observe 'you-complete-me', handler.reset
   updateDependencies()
 
 deactivate = ->
