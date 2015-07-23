@@ -15,6 +15,11 @@
       "versions": {
         "2.0.0": "provide"
       }
+    },
+    "linter": {
+      "versions": {
+        "1.0.0": "provideLinter"
+      }
     }
   }
 }
