@@ -67,7 +67,7 @@ launch = ->
     parameters.stdout = (output) -> debug.log 'CONSOLE', output
     parameters.stderr = (output) -> debug.log 'CONSOLE', output
     ycmdProcess = new BufferedProcess parameters
-    fulfill()
+    setTimeout(fulfill, 1000)
 
   Promise.all [findUnusedPort, generateRandomSecret, readDefaultOptions]
     .then processData
