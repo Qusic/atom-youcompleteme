@@ -19,6 +19,10 @@ processContext = ({editor, bufferPosition, scopeDescriptor}) ->
         .catch (error) -> reject error
 
 fetchCompletions = ({filepath, contents, filetypes, editor, bufferPosition}) ->
+  endpoint = if atom.config.get 'you-complete-me.legacyYcmdUse'
+    'completions'
+  else
+    'atom_completions'
   parameters =
     line_num: bufferPosition.row + 1
     column_num: bufferPosition.column + 1
@@ -27,7 +31,7 @@ fetchCompletions = ({filepath, contents, filetypes, editor, bufferPosition}) ->
   parameters.file_data[filepath] =
     contents: contents
     filetypes: filetypes
-  handler.request('POST', 'atom_completions', parameters).then (response) ->
+  handler.request('POST', endpoint, parameters).then (response) ->
     completions = response?.completions or []
     startColumn = (response?.completion_start_column or (bufferPosition.column + 1)) - 1
     prefix = editor.getTextInBufferRange [[bufferPosition.row, startColumn], bufferPosition]
@@ -36,22 +40,31 @@ fetchCompletions = ({filepath, contents, filetypes, editor, bufferPosition}) ->
 convertCompletions = ({completions, prefix, filetypes}) ->
   converters =
     general: (completion) ->
-      snippet: (
-        placeholderIndex = 1
-        completion.completion_chunks
-          .map (chunk) -> if chunk.placeholder then "${#{placeholderIndex++}:#{chunk.chunk}}" else chunk.chunk
-          .join ''
-      )
-      displayText: completion.display_string
-      replacementPrefix: prefix
-      leftLabel: completion.result_type
-      rightLabel: completion.kind
-      description: completion.doc_string
-      type: (
+      converted_completion = if atom.config.get 'you-complete-me.legacyYcmdUse'
+        snippet: completion.insertion_text
+        displayText: completion.menu_text
+        replacementPrefix: prefix
+        leftLabel: completion.extra_menu_info
+        rightLabel: completion.kind
+        description: ''
+      else
+        snippet: (
+          placeholderIndex = 1
+          completion.completion_chunks
+            .map (chunk) -> if chunk.placeholder then "${#{placeholderIndex++}:#{chunk.chunk}}" else chunk.chunk
+            .join ''
+        )
+        displayText: completion.display_string
+        replacementPrefix: prefix
+        leftLabel: completion.result_type
+        rightLabel: completion.kind
+        description: completion.doc_string
+      converted_completion.type = (
         switch completion.kind
           when '[File]', '[Dir]', '[File&Dir]' then 'import'
           else null
       )
+      converted_completion
 
     clang: (completion) ->
       suggestion = converters.general completion
