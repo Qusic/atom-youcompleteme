@@ -1,7 +1,7 @@
 {
   "name": "you-complete-me",
   "main": "./lib/ycm",
-  "version": "0.4.3",
+  "version": "0.5.0",
   "description": "YouCompleteMe for Atom Editor",
   "repository": "https://github.com/Qusic/atom-youcompleteme",
   "license": "MIT",
