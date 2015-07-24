@@ -18,3 +18,4 @@ module.exports =
   activate: activate
   deactivate: deactivate
   provide: () -> provider
+  provideLinter: -> provider
