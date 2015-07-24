@@ -17,7 +17,7 @@ Open Atom and it will download ycmd automatically from Github. Depending on your
 
 ```
 cd ~/.atom/packages/you-complete-me/ycmd
-./ycmd/build.py [--clang-completer] [--omnisharp-completer] [--gocode-completer]
+./build.py [--clang-completer] [--omnisharp-completer] [--gocode-completer]
 ```
 
 Sometimes you have to rebuild them after upgrading the package. You will get notified in Atom if that happens.
