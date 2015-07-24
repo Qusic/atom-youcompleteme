@@ -7,17 +7,20 @@ handler = require './handler'
 extractRange = (e) ->
   if e.location_extent.start.line_num > 0 and e.location_extent.end.line_num > 0
     [
-      [ e.location_extent.start.line_num - 1, e.location_extent.start.column_num - 1 ]
-      [ e.location_extent.end.line_num - 1, e.location_extent.end.column_num - 1 ]
+      [e.location_extent.start.line_num - 1, e.location_extent.start.column_num - 1]
+      [e.location_extent.end.line_num - 1, e.location_extent.end.column_num - 1]
     ]
   else
-    [ [ e.location.line_num-1, e.location.column_num-1 ], [ e.location.line_num-1, e.location.column_num-1 ] ]
+    [
+      [e.location.line_num - 1, e.location.column_num - 1]
+      [e.location.line_num - 1, e.location.column_num - 1]
+    ]
 
 processContext = (context) ->
   editor = context
   filepath = editor.getPath()
   contents = editor.getText()
-  return {filepath,contents}
+  return {filepath, contents}
 
 fetchEvents = ({filepath, contents}) ->
   parameters =
@@ -30,11 +33,11 @@ fetchEvents = ({filepath, contents}) ->
     contents: contents
     filetypes: ['cpp']
   handler.request('POST', 'event_notification', parameters)
-    .catch (error) =>
+    .catch (error) ->
       console.log error
-    .then (response) =>
+    .then (response) ->
       return [] unless Array.isArray response
-      issues = response.map (e) =>
+      issues = response.map (e) ->
         type: e.kind
         text: e.text
         filePath: filepath

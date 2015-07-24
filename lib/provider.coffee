@@ -19,7 +19,7 @@ module.exports =
     getSuggestions(context).catch (error) ->
       console.error '[YCM-ERROR]', error
 
-  lint: (textEditor) =>
-    getCompileEvents(textEditor).catch (error) =>
+  lint: (textEditor) ->
+    getCompileEvents(textEditor).catch (error) ->
       console.error '[YCM-ERROR]', error
       return []
