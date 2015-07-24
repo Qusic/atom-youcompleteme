@@ -20,6 +20,7 @@ dependencies = [{
     spawn atom.config.get('you-complete-me.pythonExecutable'), ['-c', versionScript], dependencyPath, requiredVersion
   extraWarning: 'Ycmd native parts have to be recompiled before it works.'
 }]
+dependencies = [] if atom.config.get 'you-complete-me.legacyYcmdUse'
 
 spawn = (command, args, cwd, output) -> new Promise (fulfill, reject) ->
   debug.log 'CMD', command, args, cwd
