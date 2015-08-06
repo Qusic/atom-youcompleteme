@@ -32,6 +32,8 @@ fetchCompletions = ({filepath, contents, filetypes, editor, bufferPosition}) ->
     completions = response?.completions or []
     startColumn = (response?.completion_start_column or (bufferPosition.column + 1)) - 1
     prefix = editor.getTextInBufferRange [[bufferPosition.row, startColumn], bufferPosition]
+    if response?.exception?
+      atom.notifications.addError "[YCM] #{response.exception.TYPE} #{response.message}", detail: "#{response.traceback}"
     return {completions, prefix, filetypes}
 
 convertCompletions = ({completions, prefix, filetypes}) ->
