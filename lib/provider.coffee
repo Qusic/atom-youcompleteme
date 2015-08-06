@@ -1,6 +1,5 @@
 getSuggestions = require './get-suggestions'
 getCompileEvents = require './get-compile-events'
-loadExtraConfig = require './load-extra-config'
 
 module.exports =
   selector: '.source.c, .source.cpp, .source.objc, .source.objcpp, .source.python'
