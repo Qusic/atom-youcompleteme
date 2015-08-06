@@ -101,6 +101,7 @@ convertCompletions = ({completions, prefix, filetypes}) ->
   completions.map (completion) -> formatter converter completion
 
 getSuggestions = (context) ->
+  if context.prefix.startsWith ';' then return Promise.resolve []
   Promise.resolve context
     .then processContext
     .then fetchCompletions
