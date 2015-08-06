@@ -141,7 +141,7 @@ request = (method, endpoint, parameters = null) -> prepare().then ->
         responseMessage.on 'data', (chunk) -> responsePayload += chunk
         responseMessage.on 'end', ->
           if verifyMessage responseMessage, responsePayload
-            responseObject = JSON.parse responsePayload
+            responseObject = try JSON.parse responsePayload catch error then responsePayload
             debug.log 'REQUEST', method, endpoint, parameters
             debug.log 'RESPONSE', responseObject
             fulfill responseObject
