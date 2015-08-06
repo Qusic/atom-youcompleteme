@@ -17,5 +17,5 @@ module.exports =
   config: config
   activate: activate
   deactivate: deactivate
-  provide: () -> provider
+  provide: -> provider
   provideLinter: -> provider

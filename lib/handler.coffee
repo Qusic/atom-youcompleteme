@@ -19,7 +19,7 @@ hmacSecret = null
 launch = ->
   findUnusedPort = new Promise (fulfill, reject) ->
     net.createServer()
-      .listen 0, () ->
+      .listen 0, ->
         result = this.address().port
         this.close()
         fulfill result
@@ -116,7 +116,7 @@ request = (method, endpoint, parameters = null) -> prepare().then ->
       return value
 
   Promise.resolve()
-    .then () ->
+    .then ->
       requestMessage =
         hostname: 'localhost'
         port: port
@@ -139,7 +139,7 @@ request = (method, endpoint, parameters = null) -> prepare().then ->
         responseMessage.setEncoding 'utf8'
         responsePayload = ''
         responseMessage.on 'data', (chunk) -> responsePayload += chunk
-        responseMessage.on 'end', () ->
+        responseMessage.on 'end', ->
           if verifyMessage responseMessage, responsePayload
             responseObject = JSON.parse responsePayload
             debug.log 'REQUEST', method, endpoint, parameters

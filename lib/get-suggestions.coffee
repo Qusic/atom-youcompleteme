@@ -15,14 +15,11 @@ processContext = ({editor, bufferPosition, scopeDescriptor}) ->
       filepath = path.resolve os.tmpdir(), "AtomYcmBuffer-#{editor.id}"
       file = new File filepath
       file.write(contents)
-        .then () -> fulfill {filepath, contents, filetypes, editor, bufferPosition}
+        .then -> fulfill {filepath, contents, filetypes, editor, bufferPosition}
         .catch (error) -> reject error
 
 fetchCompletions = ({filepath, contents, filetypes, editor, bufferPosition}) ->
-  endpoint = if atom.config.get 'you-complete-me.legacyYcmdUse'
-    'completions'
-  else
-    'atom_completions'
+  endpoint = if atom.config.get 'you-complete-me.legacyYcmdUse' then 'completions' else 'atom_completions'
   parameters =
     line_num: bufferPosition.row + 1
     column_num: bufferPosition.column + 1
@@ -40,8 +37,8 @@ fetchCompletions = ({filepath, contents, filetypes, editor, bufferPosition}) ->
 convertCompletions = ({completions, prefix, filetypes}) ->
   converters =
     general: (completion) ->
-      converted_completion = if atom.config.get 'you-complete-me.legacyYcmdUse'
-        snippet: completion.insertion_text
+      suggestion = if atom.config.get 'you-complete-me.legacyYcmdUse'
+        text: completion.insertion_text
         displayText: completion.menu_text
         replacementPrefix: prefix
         leftLabel: completion.extra_menu_info
@@ -59,12 +56,12 @@ convertCompletions = ({completions, prefix, filetypes}) ->
         leftLabel: completion.result_type
         rightLabel: completion.kind
         description: completion.doc_string
-      converted_completion.type = (
+      suggestion.type = (
         switch completion.kind
           when '[File]', '[Dir]', '[File&Dir]' then 'import'
           else null
       )
-      converted_completion
+      return suggestion
 
     clang: (completion) ->
       suggestion = converters.general completion
