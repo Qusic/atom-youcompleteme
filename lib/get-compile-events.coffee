@@ -1,7 +1,3 @@
-os = require 'os'
-path = require 'path'
-{File} = require 'atom'
-
 handler = require './handler'
 
 extractRange = (e) ->

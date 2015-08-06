@@ -1,7 +1,3 @@
-os = require 'os'
-path = require 'path'
-{File} = require 'atom'
-
 getSuggestions = require './get-suggestions'
 getCompileEvents = require './get-compile-events'
 loadExtraConfig = require './load-extra-config'
