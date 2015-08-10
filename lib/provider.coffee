@@ -6,7 +6,7 @@ module.exports =
   inclusionPriority: 1
   excludeLowerPriority: false
 
-  grammarScopes: ['source.c++', 'source.cpp', 'source.c', 'source.objc++', 'source.objcpp', 'source.objc']
+  grammarScopes: ['source.c', 'source.cpp', 'source.objc', 'source.objcpp']
   scope: 'file' # or 'project'
   lintOnFly: false # must be false for scope: 'project'
 
