@@ -1,24 +1,11 @@
-os = require 'os'
-path = require 'path'
-{File} = require 'atom'
-
 handler = require './handler'
+utility = require './utility'
 
-processContext = ({editor, bufferPosition, scopeDescriptor}) ->
-  filepath = editor.getPath()
-  contents = editor.getText()
-  filetypes = scopeDescriptor.getScopesArray().map (scope) -> scope.split('.').pop()
-  if filepath?
-    return {filepath, contents, filetypes, editor, bufferPosition}
-  else
-    return new Promise (fulfill, reject) ->
-      filepath = path.resolve os.tmpdir(), "AtomYcmBuffer-#{editor.id}"
-      file = new File filepath
-      file.write(contents)
-        .then -> fulfill {filepath, contents, filetypes, editor, bufferPosition}
-        .catch (error) -> reject error
+processContext = ({editor, scopeDescriptor, bufferPosition}) ->
+  utility.getEditorData(editor, scopeDescriptor).then ({filepath, contents, filetypes}) ->
+    return {editor, filepath, contents, filetypes, bufferPosition}
 
-fetchCompletions = ({filepath, contents, filetypes, editor, bufferPosition}) ->
+fetchCompletions = ({editor, filepath, contents, filetypes, bufferPosition}) ->
   endpoint = if atom.config.get 'you-complete-me.legacyYcmdUse' then 'completions' else 'atom_completions'
   parameters =
     line_num: bufferPosition.row + 1
@@ -32,8 +19,7 @@ fetchCompletions = ({filepath, contents, filetypes, editor, bufferPosition}) ->
     completions = response?.completions or []
     startColumn = (response?.completion_start_column or (bufferPosition.column + 1)) - 1
     prefix = editor.getTextInBufferRange [[bufferPosition.row, startColumn], bufferPosition]
-    if response?.exception?
-      atom.notifications.addError "[YCM] #{response.exception.TYPE} #{response.message}", detail: "#{response.traceback}"
+    utility.handleException response
     return {completions, prefix, filetypes}
 
 convertCompletions = ({completions, prefix, filetypes}) ->

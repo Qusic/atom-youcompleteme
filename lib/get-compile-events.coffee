@@ -1,9 +1,9 @@
 handler = require './handler'
+utility = require './utility'
 
 processContext = (editor) ->
-  filepath = editor.getPath()
-  contents = editor.getText()
-  return {filepath, contents}
+  utility.getEditorData(editor).then ({filepath, contents}) ->
+    return {filepath, contents}
 
 fetchEvents = ({filepath, contents}) ->
   parameters =
@@ -17,18 +17,7 @@ fetchEvents = ({filepath, contents}) ->
     filetypes: ['cpp']
   handler.request('POST', 'event_notification', parameters).then (response) ->
     events = if Array.isArray response then response else []
-    if response?.exception?
-      switch response.exception.TYPE
-        when 'UnknownExtraConf'
-          filepath = response.exception.extra_conf_file
-          atom.confirm
-            message: '[YCM] Unknown Extra Config'
-            detailedMessage: response.message
-            buttons:
-              Load: -> handler.request 'POST', 'load_extra_conf_file', {filepath}
-              Ignore: -> handler.request 'POST', 'ignore_extra_conf_file', {filepath}
-        else
-          atom.notifications.addError "[YCM] #{response.exception.TYPE} #{response.message}", detail: "#{response.traceback}"
+    utility.handleException response
     return {events, filepath}
 
 convertEvents = ({events, filepath}) ->
