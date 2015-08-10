@@ -6,15 +6,8 @@ processContext = (editor) ->
     return {filepath, contents}
 
 fetchEvents = ({filepath, contents}) ->
-  parameters =
-    event_name: 'FileReadyToParse'
-    filepath: filepath
-    file_data: {}
-    line_num: 1
-    column_num: 1
-  parameters.file_data[filepath] =
-    contents: contents
-    filetypes: ['cpp']
+  parameters = utility.buildRequestParameters filepath, contents, ['cpp']
+  parameters.event_name = 'FileReadyToParse'
   handler.request('POST', 'event_notification', parameters).then (response) ->
     events = if Array.isArray response then response else []
     utility.handleException response

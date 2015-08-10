@@ -7,14 +7,7 @@ processContext = ({editor, scopeDescriptor, bufferPosition}) ->
 
 fetchCompletions = ({editor, filepath, contents, filetypes, bufferPosition}) ->
   endpoint = if atom.config.get 'you-complete-me.legacyYcmdUse' then 'completions' else 'atom_completions'
-  parameters =
-    line_num: bufferPosition.row + 1
-    column_num: bufferPosition.column + 1
-    filepath: filepath
-    file_data: {}
-  parameters.file_data[filepath] =
-    contents: contents
-    filetypes: filetypes
+  parameters = utility.buildRequestParameters filepath, contents, filetypes, bufferPosition
   handler.request('POST', endpoint, parameters).then (response) ->
     completions = response?.completions or []
     startColumn = (response?.completion_start_column or (bufferPosition.column + 1)) - 1

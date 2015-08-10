@@ -17,6 +17,17 @@ getEditorData = (editor = atom.workspace.getActiveTextEditor(), scopeDescriptor 
         .then -> fulfill {filepath, contents, filetypes, bufferPosition}
         .catch (error) -> reject error
 
+buildRequestParameters = (filepath, contents, filetypes = [], bufferPosition = [0, 0]) ->
+  parameters =
+    filepath: filepath
+    line_num: bufferPosition.row + 1
+    column_num: bufferPosition.column + 1
+    file_data: {}
+  parameters.file_data[filepath] =
+    contents: contents
+    filetypes: filetypes
+  return parameters
+
 handleException = (response) ->
   notifyException = ->
     atom.notifications.addError "[YCM] #{response.exception.TYPE} #{response.message}", detail: "#{response.traceback}"
