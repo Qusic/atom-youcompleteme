@@ -9,14 +9,14 @@ packagePath = path.resolve atom.packages.resolvePackagePath('you-complete-me')
 dependencies = [{
   name: 'ycmd'
   repo: 'https://github.com/Qusic/ycmd.git'
-  commit: '5796f7d3bccd7050384c4cc710845351bcd416e2'
+  commit: '39b617c6014e6482df644bf22eaf594665e6bf49'
   extraCheck: (dependencyPath) ->
     versionScript = '''
       from sys import stdout
       from ycm_client_support import YcmCoreVersion
       print YcmCoreVersion()
     '''
-    requiredVersion = '17'
+    requiredVersion = '18'
     spawn atom.config.get('you-complete-me.pythonExecutable'), ['-c', versionScript], dependencyPath, requiredVersion
   extraWarning: 'Ycmd native parts have to be recompiled before it works.'
 }]
