@@ -12,7 +12,6 @@ fetchCompletions = ({editor, filepath, contents, filetypes, bufferPosition}) ->
     completions = response?.completions or []
     startColumn = (response?.completion_start_column or (bufferPosition.column + 1)) - 1
     prefix = editor.getTextInBufferRange [[bufferPosition.row, startColumn], bufferPosition]
-    utility.handleException response
     return {completions, prefix, filetypes}
 
 convertCompletions = ({completions, prefix, filetypes}) ->

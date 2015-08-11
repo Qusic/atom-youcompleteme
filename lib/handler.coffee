@@ -8,6 +8,7 @@ querystring = require 'querystring'
 url = require 'url'
 {BufferedProcess} = require 'atom'
 
+utility = require './utility'
 debug = require './debug'
 
 ycmdPath = path.resolve atom.packages.resolvePackagePath('you-complete-me'), 'ycmd'
@@ -144,6 +145,7 @@ request = (method, endpoint, parameters = null) -> prepare().then ->
             responseObject = try JSON.parse responsePayload catch error then responsePayload
             debug.log 'REQUEST', method, endpoint, parameters
             debug.log 'RESPONSE', responseObject
+            utility.handleException responseObject
             fulfill responseObject
           else
             reject new Error 'Bad Hmac'

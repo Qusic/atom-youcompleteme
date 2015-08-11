@@ -10,7 +10,6 @@ fetchEvents = ({filepath, contents}) ->
   parameters.event_name = 'FileReadyToParse'
   handler.request('POST', 'event_notification', parameters).then (response) ->
     events = if Array.isArray response then response else []
-    utility.handleException response
     return {events, filepath}
 
 convertEvents = ({events, filepath}) ->
