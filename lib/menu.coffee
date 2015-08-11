@@ -1,40 +1,37 @@
 handler = require './handler'
 utility = require './utility'
 
-completerCommands = {}
+commands =
+  'get-type': 'GetType'
+  'get-parent': 'GetParent'
+  'go-to-declaration': 'GoToDeclaration'
+  'go-to-definition': 'GoToDefinition'
+  'go-to': 'GoTo'
+  'go-to-imprecise': 'GoToImprecise'
+  #'fix-it': 'FixIt' # TODO
+  'clear-compilation-flag-cache': 'ClearCompilationFlagCache'
 contextMenu = null
-
-getCommands = ->
-  filetype = utility.getEditorFiletype()
-  if completerCommands.hasOwnProperty filetype
-    return completerCommands[filetype]
-  else
-    Promise.resolve()
-      .then utility.getEditorData
-      .then ({filepath, contents, filetypes}) ->
-        parameters = utility.buildRequestParameters filepath, contents, filetypes
-        parameters.completer_target = filetype
-        handler.request('POST', 'defined_subcommands', parameters).then (response) ->
-          completerCommands[filetype] = if Array.isArray response then response else []
-    return ['Querying...']
 
 runCommand = (command) ->
   Promise.resolve()
     .then utility.getEditorData
     .then ({filepath, contents, filetypes, bufferPosition}) ->
       parameters = utility.buildRequestParameters filepath, contents, filetypes, bufferPosition
+      parameters.command_arguments = [command]
       handler.request('POST', 'run_completer_command', parameters).then (response) ->
+        if command.startsWith 'Get'
+          atom.notifications.addInfo "[YCM] #{command}", detail: response.message
+        else if command.startsWith 'GoTo'
+          atom.workspace.open response.filepath, initialLine: response.line_num - 1, initialColumn: response.column_num - 1
 
 register = ->
-  atom.commands.add 'atom-text-editor', 'you-complete-me:command', (event) ->
-    # TODO: No API to know which command is invoked here.
-  contextMenu = atom.contextMenu.add
-    'atom-text-editor': [{
-      label: 'YouCompleteMe'
-      created: (event) -> @submenu = getCommands().map (command) ->
-        label: command
-        command: 'you-complete-me:command'
-    }]
+  generatedCommands = {}
+  generatedMenus = []
+  for key, command of commands
+    generatedCommands["you-complete-me:#{key}"] = ((command) -> (event) -> runCommand command)(command)
+    generatedMenus.push command: "you-complete-me:#{key}", label: command
+  atom.commands.add 'atom-text-editor', generatedCommands
+  contextMenu = atom.contextMenu.add 'atom-text-editor': [label: 'YouCompleteMe', submenu: generatedMenus]
 
 deregister = ->
   contextMenu?.dispose()

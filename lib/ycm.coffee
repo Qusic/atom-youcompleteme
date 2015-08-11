@@ -8,12 +8,12 @@ configObserver = null
 
 activate = ->
   configObserver = atom.config.observe 'you-complete-me', handler.reset
-  #menu.register()
+  menu.register()
   updateDependencies()
 
 deactivate = ->
   configObserver?.dispose()
-  #menu.deregister()
+  menu.deregister()
   handler.reset()
 
 module.exports =
