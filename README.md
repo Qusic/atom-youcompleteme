@@ -1,11 +1,18 @@
 # Atom YouCompleteMe package
 
-[AutoComplete+](https://github.com/atom-community/autocomplete-plus) Provider and [AtomLinter](https://github.com/AtomLinter/atom-linter) Provider for [YouCompleteMe](https://github.com/Valloric/YouCompleteMe)
+[YouCompleteMe](https://github.com/Valloric/YouCompleteMe) for Atom
 
 ## Previews
 
 ![](https://cloud.githubusercontent.com/assets/2141853/7626423/79024212-fa3b-11e4-941e-e014a8e5b0df.gif)
 ![](https://cloud.githubusercontent.com/assets/2141853/7626422/7901f352-fa3b-11e4-8007-82ab514fb8e9.gif)
+
+## Features
+
+* Semantic code completion using [autocomplete+](https://github.com/atom-community/autocomplete-plus)
+* Diagnostic display using [atom-linter](https://github.com/AtomLinter/atom-linter)
+* Commands and context menus to query the type of variables or methods
+* Commands and context menus to go to declaration or definition
 
 ## Usage
 
