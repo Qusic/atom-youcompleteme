@@ -17,6 +17,9 @@ getEditorData = (editor = atom.workspace.getActiveTextEditor(), scopeDescriptor 
         .then -> fulfill {filepath, contents, filetypes, bufferPosition}
         .catch (error) -> reject error
 
+getEditorFiletype = (scopeDescriptor = atom.workspace.getActiveTextEditor().getRootScopeDescriptor()) ->
+  return scopeDescriptor.getScopesArray()[0].split('.').pop()
+
 buildRequestParameters = (filepath, contents, filetypes = [], bufferPosition = [0, 0]) ->
   parameters =
     filepath: filepath
@@ -49,4 +52,6 @@ handleException = (response) ->
 
 module.exports =
   getEditorData: getEditorData
+  getEditorFiletype: getEditorFiletype
+  buildRequestParameters: buildRequestParameters
   handleException: handleException
