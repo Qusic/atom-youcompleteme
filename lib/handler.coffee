@@ -116,6 +116,25 @@ request = (method, endpoint, parameters = null) -> prepare().then ->
     else
       return value
 
+  handleException = (response) ->
+    notifyException = ->
+      atom.notifications.addError "[YCM] #{response.exception.TYPE} #{response.message}", detail: "#{response.traceback}"
+
+    confirmExtraConfig = ->
+      filepath = response.exception.extra_conf_file
+      message = response.message
+      atom.confirm
+        message: '[YCM] Unknown Extra Config'
+        detailedMessage: message
+        buttons:
+          Load: -> request 'POST', 'load_extra_conf_file', {filepath}
+          Ignore: -> request 'POST', 'ignore_extra_conf_file', {filepath}
+
+    if response?.exception?
+      switch response.exception.TYPE
+        when 'UnknownExtraConf' then confirmExtraConfig()
+        else notifyException()
+
   Promise.resolve()
     .then ->
       requestMessage =
@@ -145,7 +164,7 @@ request = (method, endpoint, parameters = null) -> prepare().then ->
             responseObject = try JSON.parse responsePayload catch error then responsePayload
             debug.log 'REQUEST', method, endpoint, parameters
             debug.log 'RESPONSE', responseObject
-            utility.handleException responseObject
+            handleException responseObject
             fulfill responseObject
           else
             reject new Error 'Bad Hmac'
