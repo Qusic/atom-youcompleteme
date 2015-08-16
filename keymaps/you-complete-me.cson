@@ -1,0 +1,8 @@
+'atom-text-editor':
+  'alt-y t': 'you-complete-me:get-type'
+  'alt-y p': 'you-complete-me:get-parent'
+  'alt-y g': 'you-complete-me:go-to'
+  'alt-y i': 'you-complete-me:go-to-imprecise'
+  'alt-y c': 'you-complete-me:go-to-declaration'
+  'alt-y d': 'you-complete-me:go-to-definition'
+
