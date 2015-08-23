@@ -14,6 +14,15 @@
 * Commands and context menus to query the type of variables or methods
 * Commands and context menus to go to declaration or definition
 
+## Keymaps
+
+* <kbd>alt</kbd>+<kbd>y</kbd> <kbd>t</kbd> Get Type
+* <kbd>alt</kbd>+<kbd>y</kbd> <kbd>p</kbd> Get Parent
+* <kbd>alt</kbd>+<kbd>y</kbd> <kbd>g</kbd> Go To
+* <kbd>alt</kbd>+<kbd>y</kbd> <kbd>i</kbd> Go To Imprecise
+* <kbd>alt</kbd>+<kbd>y</kbd> <kbd>c</kbd> Go To Declaration
+* <kbd>alt</kbd>+<kbd>y</kbd> <kbd>d</kbd> Go To Definition
+
 ## Usage
 
 ### 1. Install the package
