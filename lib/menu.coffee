@@ -20,9 +20,11 @@ runCommand = (command) ->
       parameters.command_arguments = [command]
       handler.request('POST', 'run_completer_command', parameters).then (response) ->
         if command.startsWith 'Get'
-          atom.notifications.addInfo "[YCM] #{command}", detail: response.message
+          if response?.message?
+            atom.notifications.addInfo "[YCM] #{command}", detail: response.message
         else if command.startsWith 'GoTo'
-          atom.workspace.open response.filepath, initialLine: response.line_num - 1, initialColumn: response.column_num - 1
+          if response?.filepath?
+            atom.workspace.open response.filepath, initialLine: response.line_num - 1, initialColumn: response.column_num - 1
 
 register = ->
   generatedCommands = {}
