@@ -45,3 +45,9 @@ You may notice that this package uses a fork of ycmd instead of the original one
 It is also possible to use this package with the original ycmd but some features may be limited. You can configure it in the settings.
 
 For detailed instructions and troubleshooting on building ycmd, see [YouCompleteMe's README](https://github.com/Valloric/YouCompleteMe/blob/master/README.md#installation).
+
+## FAQ
+
+### It always gives an error stating that ycmd needs to be recompiled.
+
+Check your Python Executable config and make sure you are using python2 instead of python3.
