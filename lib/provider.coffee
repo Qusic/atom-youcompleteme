@@ -8,7 +8,7 @@ module.exports =
 
   grammarScopes: ['source.c', 'source.cpp', 'source.objc', 'source.objcpp']
   scope: 'file' # or 'project'
-  lintOnFly: false # must be false for scope: 'project'
+  lintOnFly: atom.config.get 'you-complete-me.lintDuringEdit' # must be false for scope: 'project'
 
   getSuggestions: (context) ->
     getSuggestions(context).catch (error) ->
