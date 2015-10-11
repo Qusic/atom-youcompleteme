@@ -10,7 +10,7 @@
 ## Features
 
 * Semantic code completion using [autocomplete+](https://github.com/atom-community/autocomplete-plus)
-* Diagnostic display using [atom-linter](https://github.com/AtomLinter/atom-linter)
+* Diagnostic display using [linter](https://github.com/atom-community/linter)
 * Commands and context menus to query the type of variables or methods
 * Commands and context menus to go to declaration or definition
 
