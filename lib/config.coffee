@@ -11,3 +11,6 @@ module.exports =
   legacyYcmdPath:
     type: 'string'
     default: '/usr/lib/youcompleteme/third_party/ycmd/ycmd'
+  lintDuringEdit:
+    type: 'boolean'
+    default: false

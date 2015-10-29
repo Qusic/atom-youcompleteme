@@ -118,7 +118,10 @@ request = (method, endpoint, parameters = null) -> prepare().then ->
 
   handleException = (response) ->
     notifyException = ->
-      atom.notifications.addError "[YCM] #{response.exception.TYPE} #{response.message}", detail: "#{response.traceback}"
+      if atom.inDevMode()
+        atom.notifications.addError "[YCM] #{response.exception.TYPE} #{response.message}", detail: "#{response.traceback}"
+      else
+        atom.notifications.addError "[YCM] #{response.exception.TYPE} #{response.message}"
 
     confirmExtraConfig = ->
       filepath = response.exception.extra_conf_file
