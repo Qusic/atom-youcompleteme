@@ -111,7 +111,7 @@ request = (method, endpoint, parameters = null) -> prepare().then ->
       for i in [0...value.length]
         char = value.charAt i
         charCode = value.charCodeAt i
-        escapedString += if charCode < 0x80 then char else "\\u#{"0000#{charCode.toString 16}".substr -4}"
+        escapedString += if charCode < 0x80 then char else ('\\u' + ('0000' + charCode.toString 16).substr -4)
       return escapedString
     else
       return value
