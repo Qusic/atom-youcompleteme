@@ -130,10 +130,13 @@ request = (method, endpoint, parameters = null) -> prepare().then ->
           Load: -> request 'POST', 'load_extra_conf_file', {filepath}
           Ignore: -> request 'POST', 'ignore_extra_conf_file', {filepath}
 
+    shouldIgnore = ->
+      response.message is 'File already being parsed.'
+
     if response?.exception?
       switch response.exception.TYPE
         when 'UnknownExtraConf' then confirmExtraConfig()
-        else notifyException()
+        else notifyException() unless shouldIgnore
 
   Promise.resolve()
     .then ->
