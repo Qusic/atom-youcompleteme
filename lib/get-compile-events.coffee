@@ -10,9 +10,9 @@ fetchEvents = ({filepath, contents}) ->
   parameters.event_name = 'FileReadyToParse'
   handler.request('POST', 'event_notification', parameters).then (response) ->
     events = if Array.isArray response then response else []
-    return {events, filepath}
+    return {events}
 
-convertEvents = ({events, filepath}) ->
+convertEvents = ({events}) ->
   extractRange = (event) ->
     if event.location_extent.start.line_num > 0 and event.location_extent.end.line_num > 0 then [
       [event.location_extent.start.line_num - 1, event.location_extent.start.column_num - 1]
@@ -25,7 +25,7 @@ convertEvents = ({events, filepath}) ->
   events.map (event) ->
     type: event.kind
     text: event.text
-    filePath: filepath
+    filePath: event.location.filepath
     range: extractRange event
 
 getCompileEvents = (context) ->
