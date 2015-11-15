@@ -1,14 +1,9 @@
 handler = require './handler'
 utility = require './utility'
+dispatch = require './dispatch'
 
-processContext = (editor) ->
-  utility.getEditorData(editor).then ({filepath, contents}) ->
-    return {filepath, contents}
-
-fetchEvents = ({filepath, contents}) ->
-  parameters = utility.buildRequestParameters filepath, contents, ['cpp']
-  parameters.event_name = 'FileReadyToParse'
-  handler.request('POST', 'event_notification', parameters).then (response) ->
+fetchEvents = (context) ->
+  dispatch.processReady(context).then (response) ->
     events = if Array.isArray response then response else []
     return {events}
 
@@ -29,9 +24,15 @@ convertEvents = ({events}) ->
     range: extractRange event
 
 getCompileEvents = (context) ->
-  Promise.resolve context
-    .then processContext
+  return Promise.resolve [] unless context.getPath()?
+  return Promise.resolve [] if utility.getFileStatus context.getPath(), 'ready'
+  return Promise.resolve [] if utility.getFileStatus context.getPath(), 'closing'
+
+  filepath = context.getPath()
+  Promise.resolve {editor: context}
+    .then dispatch.processBefore(false)
     .then fetchEvents
+    .then dispatch.processAfter(filepath), dispatch.processAfterError(filepath)
     .then convertEvents
 
 module.exports = getCompileEvents

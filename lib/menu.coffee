@@ -1,5 +1,6 @@
 handler = require './handler'
 utility = require './utility'
+dispatch = require './dispatch'
 
 commands =
   'get-type': 'GetType'
@@ -13,10 +14,16 @@ commands =
 contextMenu = null
 
 runCommand = (command) ->
-  Promise.resolve()
-    .then utility.getEditorData
-    .then ({filepath, contents, filetypes, bufferPosition}) ->
-      parameters = utility.buildRequestParameters filepath, contents, filetypes, bufferPosition
+  editor = atom.workspace.getActiveTextEditor()
+  return Promise.resolve() unless editor.getPath()?
+  return Promise.resolve() if utility.getFileStatus editor.getPath(), 'ready'
+  return Promise.resolve() if utility.getFileStatus editor.getPath(), 'closing'
+
+  filepath = editor.getPath()
+  Promise.resolve {editor}
+    .then dispatch.processBefore(true)
+    .then ({filedatas, bufferPosition}) ->
+      parameters = utility.buildRequestParameters filedatas, bufferPosition
       parameters.command_arguments = [command]
       handler.request('POST', 'run_completer_command', parameters).then (response) ->
         if command.startsWith 'Get'
@@ -25,6 +32,7 @@ runCommand = (command) ->
         else if command.startsWith 'GoTo'
           if response?.filepath?
             atom.workspace.open response.filepath, initialLine: response.line_num - 1, initialColumn: response.column_num - 1
+    .then dispatch.processAfter(filepath), dispatch.processAfterError(filepath)
 
 register = ->
   generatedCommands = {}

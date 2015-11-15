@@ -1,18 +1,18 @@
 handler = require './handler'
 utility = require './utility'
+dispatch = require './dispatch'
 
-processContext = ({editor, scopeDescriptor, bufferPosition}) ->
-  utility.getEditorData(editor, scopeDescriptor).then ({filepath, contents, filetypes}) ->
-    return {editor, filepath, contents, filetypes, bufferPosition}
-
-fetchCompletions = ({editor, filepath, contents, filetypes, bufferPosition}) ->
+fetchCompletions = (activatedManually) -> ({editor, filedatas, bufferPosition}) ->
   endpoint = if atom.config.get 'you-complete-me.legacyYcmdUse' then 'completions' else 'atom_completions'
-  parameters = utility.buildRequestParameters filepath, contents, filetypes, bufferPosition
+  parameters = utility.buildRequestParameters filedatas, bufferPosition
+  if activatedManually
+    parameters.force_semantic = true
+  # TODO: workspace
   handler.request('POST', endpoint, parameters).then (response) ->
     completions = response?.completions or []
     startColumn = (response?.completion_start_column or (bufferPosition.column + 1)) - 1
     prefix = editor.getTextInBufferRange [[bufferPosition.row, startColumn], bufferPosition]
-    return {completions, prefix, filetypes}
+    return {completions, prefix, filetypes: filedatas[0].filetypes}
 
 convertCompletions = ({completions, prefix, filetypes}) ->
   converters =
@@ -79,10 +79,15 @@ convertCompletions = ({completions, prefix, filetypes}) ->
   completions.map (completion) -> formatter converter completion
 
 getSuggestions = (context) ->
-  if context.prefix.startsWith ';' then return Promise.resolve []
+  return Promise.resolve [] unless context.editor.getPath()?
+  return Promise.resolve [] if utility.getFileStatus context.editor.getPath(), 'ready'
+  return Promise.resolve [] if utility.getFileStatus context.editor.getPath(), 'closing'
+
+  filepath = context.editor.getPath()
   Promise.resolve context
-    .then processContext
-    .then fetchCompletions
+    .then dispatch.processBefore(true)
+    .then fetchCompletions(context.fetchCompletions)
+    .then dispatch.processAfter(filepath), dispatch.processAfterError(filepath)
     .then convertCompletions
 
 module.exports = getSuggestions

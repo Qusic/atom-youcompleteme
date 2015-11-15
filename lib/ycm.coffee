@@ -3,6 +3,7 @@ provider = require './provider'
 config = require './config'
 menu = require './menu'
 updateDependencies = require './update-dependencies'
+dispatch = require './dispatch'
 
 configObserver = null
 
@@ -15,6 +16,7 @@ deactivate = ->
   configObserver?.dispose()
   menu.deregister()
   handler.reset()
+  dispatch.dispose()
 
 module.exports =
   config: config

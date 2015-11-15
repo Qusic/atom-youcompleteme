@@ -85,7 +85,8 @@ reset = ->
   ycmdProcess = null
   port = null
   hmacSecret = null
-  Promise.resolve()
+  #Promise.resolve()
+  utility.resetFileStatus()
 
 request = (method, endpoint, parameters = null) -> prepare().then ->
   generateHmac = (data, encoding) ->
