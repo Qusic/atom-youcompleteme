@@ -2,7 +2,7 @@ handler = require './handler'
 provider = require './provider'
 config = require './config'
 menu = require './menu'
-updateDependencies = require './update-dependencies'
+#updateDependencies = require './update-dependencies'
 dispatch = require './dispatch'
 
 configObserver = null
@@ -10,7 +10,7 @@ configObserver = null
 activate = ->
   configObserver = atom.config.observe 'you-complete-me', handler.reset
   menu.register()
-  updateDependencies()
+  #updateDependencies()
 
 deactivate = ->
   configObserver?.dispose()

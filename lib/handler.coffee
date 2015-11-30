@@ -11,8 +11,7 @@ url = require 'url'
 utility = require './utility'
 debug = require './debug'
 
-ycmdPath = path.resolve atom.packages.resolvePackagePath('you-complete-me'), 'ycmd'
-ycmdPath = atom.config.get 'you-complete-me.legacyYcmdPath' if atom.config.get 'you-complete-me.legacyYcmdUse'
+ycmdPath = atom.config.get 'you-complete-me.legacyYcmdPath'
 ycmdProcess = null
 port = null
 hmacSecret = null

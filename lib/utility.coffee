@@ -5,7 +5,7 @@ getEditorData = (editor = atom.workspace.getActiveTextEditor(), scopeDescriptor 
     filepath: x.getPath()
     contents: x.getText()
     filetypes: (if x is editor then scopeDescriptor else x.getRootScopeDescriptor())
-      .getScopesArray().map (scope) -> scope.split('.').pop()
+      .getScopesArray()[0].split('.').pop()
 
   Promise.resolve {filedatas, bufferPosition}
 

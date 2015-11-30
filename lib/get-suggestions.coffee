@@ -3,12 +3,11 @@ utility = require './utility'
 dispatch = require './dispatch'
 
 fetchCompletions = (activatedManually) -> ({editor, filedatas, bufferPosition}) ->
-  endpoint = if atom.config.get 'you-complete-me.legacyYcmdUse' then 'completions' else 'atom_completions'
   parameters = utility.buildRequestParameters filedatas, bufferPosition
   if activatedManually
     parameters.force_semantic = true
   # TODO: workspace
-  handler.request('POST', endpoint, parameters).then (response) ->
+  handler.request('POST', 'completions', parameters).then (response) ->
     completions = response?.completions or []
     startColumn = (response?.completion_start_column or (bufferPosition.column + 1)) - 1
     prefix = editor.getTextInBufferRange [[bufferPosition.row, startColumn], bufferPosition]
@@ -17,25 +16,13 @@ fetchCompletions = (activatedManually) -> ({editor, filedatas, bufferPosition}) 
 convertCompletions = ({completions, prefix, filetypes}) ->
   converters =
     general: (completion) ->
-      suggestion = if atom.config.get 'you-complete-me.legacyYcmdUse'
+      suggestion =
         text: completion.insertion_text
         displayText: completion.menu_text
         replacementPrefix: prefix
         leftLabel: completion.extra_menu_info
         rightLabel: completion.kind
         description: ''
-      else
-        snippet: (
-          placeholderIndex = 1
-          completion.completion_chunks
-            .map (chunk) -> if chunk.placeholder then "${#{placeholderIndex++}:#{chunk.chunk}}" else chunk.chunk
-            .join ''
-        )
-        displayText: completion.display_string
-        replacementPrefix: prefix
-        leftLabel: completion.result_type
-        rightLabel: completion.kind
-        description: completion.doc_string
       suggestion.type = (
         switch completion.kind
           when '[File]', '[Dir]', '[File&Dir]' then 'import'
@@ -64,11 +51,6 @@ convertCompletions = ({completions, prefix, filetypes}) ->
       suggestion.type = completion.display_string.substr(0, (completion.display_string.indexOf ': '))
       return suggestion
 
-  formatter = (suggestion) ->
-    if suggestion.leftLabel?.length > 20
-      suggestion.leftLabel = "#{suggestion.leftLabel.substr 0, 20}…"
-    return suggestion
-
   converter = converters[(
     switch filetypes[0]
       when 'c', 'cpp', 'objc', 'objcpp' then 'clang'
@@ -76,7 +58,7 @@ convertCompletions = ({completions, prefix, filetypes}) ->
       else 'general'
   )]
 
-  completions.map (completion) -> formatter converter completion
+  completions.map (completion) -> converter completion
 
 getSuggestions = (context) ->
   return Promise.resolve [] unless context.editor.getPath()?

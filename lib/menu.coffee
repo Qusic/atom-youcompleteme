@@ -9,6 +9,7 @@ commands =
   'go-to-definition': 'GoToDefinition'
   'go-to': 'GoTo'
   'go-to-imprecise': 'GoToImprecise'
+  'go-to-include': 'GoToInclude'
   #'fix-it': 'FixIt' # TODO
   'clear-compilation-flag-cache': 'ClearCompilationFlagCache'
 contextMenu = null
