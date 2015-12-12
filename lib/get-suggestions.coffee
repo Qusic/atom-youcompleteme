@@ -1,10 +1,11 @@
 handler = require './handler'
 utility = require './utility'
 dispatch = require './dispatch'
+lexer = require './lexer'
 
 fetchCompletions = (activatedManually) -> ({editor, filedatas, bufferPosition}) ->
   parameters = utility.buildRequestParameters filedatas, bufferPosition
-  if activatedManually
+  if activatedManually or atom.config.get 'you-complete-me.forceComplete'
     parameters.force_semantic = true
   # TODO: workspace
   handler.request('POST', 'completions', parameters).then (response) ->
@@ -31,6 +32,7 @@ convertCompletions = ({completions, prefix, filetypes}) ->
       return suggestion
 
     clang: (completion) ->
+      return lexer.clangFunctionLexer completion, prefix if completion.kind is 'FUNCTION'
       suggestion = converters.general completion
       suggestion.type = (
         switch completion.kind
@@ -40,11 +42,11 @@ convertCompletions = ({completions, prefix, filetypes}) ->
           when 'FUNCTION' then 'function'
           when 'VARIABLE', 'PARAMETER' then 'variable'
           when 'MACRO' then 'constant'
-          when 'NAMESPACE' then 'keyword'
+          when 'NAMESPACE' then 'package'
           when 'UNKNOWN' then 'value'
           else suggestion.type
       )
-      return suggestion
+      return lexer.clangGeneralPlus completion, suggestion
 
     python: (completion) ->
       suggestion = converters.general completion
@@ -58,7 +60,9 @@ convertCompletions = ({completions, prefix, filetypes}) ->
       else 'general'
   )]
 
-  completions.map (completion) -> converter completion
+  r = completions.map (completion) -> converter completion
+  if r.length > 0 and Array.isArray(r[0]) then r = r.reduce (prev, cur) -> prev.concat cur
+  return r
 
 getSuggestions = (context) ->
   return Promise.resolve [] unless context.editor.getPath()?
@@ -68,7 +72,7 @@ getSuggestions = (context) ->
   filepath = context.editor.getPath()
   Promise.resolve context
     .then dispatch.processBefore(true)
-    .then fetchCompletions(context.fetchCompletions)
+    .then fetchCompletions(context.activatedManually)
     .then dispatch.processAfter(filepath), dispatch.processAfterError(filepath)
     .then convertCompletions
 

@@ -4,13 +4,13 @@ getEditorData = (editor = atom.workspace.getActiveTextEditor(), scopeDescriptor 
   filedatas = curedit.map (x) ->
     filepath: x.getPath()
     contents: x.getText()
-    filetypes: (if x is editor then scopeDescriptor else x.getRootScopeDescriptor())
-      .getScopesArray()[0].split('.').pop()
+    filetypes: [(if x is editor then scopeDescriptor else x.getRootScopeDescriptor())
+      .getScopesArray()[0].split('.').pop()]
 
   Promise.resolve {filedatas, bufferPosition}
 
 getEditorFiletype = (scopeDescriptor = atom.workspace.getActiveTextEditor().getRootScopeDescriptor()) ->
-  return scopeDescriptor.getScopesArray()[0].split('.').pop()
+  return [scopeDescriptor.getScopesArray()[0].split('.').pop()]
 
 buildRequestParameters = (filedatas, bufferPosition = [0, 0]) ->
   parameters =
