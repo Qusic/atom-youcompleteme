@@ -10,6 +10,7 @@ module.exports =
   legacyYcmdPath:
     type: 'string'
     title: 'Path of ycmd server'
+    default: ''
     order: 1
   lintDuringEdit:
     type: 'boolean'

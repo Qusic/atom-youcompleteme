@@ -17,7 +17,6 @@ buildBufferVisit = (filedata) ->
 buildFileReadyToParse = (filedatas, bufferPosition = [0, 0]) ->
   parameters = utility.buildRequestParameters filedatas, bufferPosition
   parameters.event_name = 'FileReadyToParse'
-  # TODO: ctag support
   handler.request('POST', 'event_notification', parameters)
 
 processContext = ({editor, scopeDescriptor, bufferPosition}) ->

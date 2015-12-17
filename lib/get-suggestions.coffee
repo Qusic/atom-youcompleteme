@@ -2,12 +2,13 @@ handler = require './handler'
 utility = require './utility'
 dispatch = require './dispatch'
 lexer = require './lexer'
+path = require 'path'
 
 fetchCompletions = (activatedManually) -> ({editor, filedatas, bufferPosition}) ->
   parameters = utility.buildRequestParameters filedatas, bufferPosition
   if activatedManually or atom.config.get 'you-complete-me.forceComplete'
     parameters.force_semantic = true
-  # TODO: workspace
+  parameters.working_dir = path.dirname parameters.filepath
   handler.request('POST', 'completions', parameters).then (response) ->
     completions = response?.completions or []
     startColumn = (response?.completion_start_column or (bufferPosition.column + 1)) - 1
