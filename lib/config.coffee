@@ -20,6 +20,10 @@ module.exports =
     type: 'boolean'
     default: true
     order: 4
+  rustSupport:
+    type: 'boolean'
+    default: true
+    order: 4
   csharpSupport:
     type: 'boolean'
     default: true
