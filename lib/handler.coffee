@@ -11,10 +11,8 @@ url = require 'url'
 utility = require './utility'
 debug = require './debug'
 
-ycmdPath = atom.config.get('you-complete-me.legacyYcmdPath') or  path.resolve atom.packages.resolvePackagePath('you-complete-me'), 'ycmd'
-ycmdProcess = null
-port = null
-hmacSecret = null
+ycmdPath = ycmdProcess = port = hmacSecret = null
+
 
 launch = ->
   findUnusedPort = new Promise (fulfill, reject) ->
@@ -80,11 +78,11 @@ prepare = ->
     launch()
 
 reset = ->
+  ycmdPath = atom.config.get('you-complete-me.legacyYcmdPath') or path.resolve atom.packages.resolvePackagePath('you-complete-me'), 'ycmd'
   ycmdProcess?.kill()
   ycmdProcess = null
   port = null
   hmacSecret = null
-  #Promise.resolve()
   utility.resetFileStatus()
 
 request = (method, endpoint, parameters = null) -> prepare().then ->
@@ -194,11 +192,10 @@ request = (method, endpoint, parameters = null) -> prepare().then ->
 # POST /ignore_extra_conf_file
 #
 # POST /debug_info
-#
-# Only available on Qusic's ycmd fork:
-# POST /atom_completions
 
 module.exports =
   prepare: prepare
   reset: reset
   request: request
+
+reset()
