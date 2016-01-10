@@ -35,7 +35,7 @@ processVisit = (context) ->
       bak =
         filepath: context.editor.getPath()
         contents: ''
-        filetypes: utility.getEditorFiletype context.editor.getRootScopeDescriptor()
+        filetypes: utility.getEditorFiletype context.editor, context.editor.getRootScopeDescriptor()
 
       # add onDidDestroy
       destroy = ->

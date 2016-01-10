@@ -1,13 +1,19 @@
-getSuggestions = require './get-suggestions'
+{getSuggestions} = require './get-suggestions'
 getCompileEvents = require './get-compile-events'
 
 module.exports =
   selector: (
     langs = ['.source.c', '.source.cpp', '.source.objc', '.source.objcpp']
-    langs.push('.source.python') if not atom.config.get('you-complete-me.pythonSupport')? or atom.config.get 'you-complete-me.pythonSupport'
-    langs.push('.source.cs') if not atom.config.get('you-complete-me.csharpSupport')? or atom.config.get 'you-complete-me.csharpSupport'
-    langs.push('.source.go') if not atom.config.get('you-complete-me.golangSupport')? or atom.config.get 'you-complete-me.golangSupport'
-    langs.push('.source.rust') if not atom.config.get('you-complete-me.rustSupport')? or atom.config.get 'you-complete-me.rustSupport'
+    for {lang, supportLang} in [
+      {lang: 'python'}
+      {lang: 'cs', supportLang: 'csharp'}
+      {lang: 'go', supportLang: 'golang'}
+      {lang: 'rust'}
+      ]
+      configKey = 'you-complete-me.' + (supportLang ? lang)
+      langs.push('.source.' + lang) if not atom.config.get(configKey)? or
+                                           atom.config.get configKey
+
     langs.join ','
   )
   disableForSelector: '.source.c .comment, .source.cpp .comment, .source.objc .comment, .source.objcpp .comment, .source.python .comment, .source.cs .comment, .source.go .comment .source.rust.comment'

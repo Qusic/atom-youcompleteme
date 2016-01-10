@@ -9,7 +9,8 @@ getEditorData = (editor = atom.workspace.getActiveTextEditor(), scopeDescriptor 
 
   Promise.resolve {filedatas, bufferPosition}
 
-getEditorFiletype = (scopeDescriptor = atom.workspace.getActiveTextEditor().getRootScopeDescriptor()) ->
+getEditorFiletype = (editor = atom.workspace.getActiveTextEditor(),
+                     scopeDescriptor = editor.getRootScopeDescriptor()) ->
   return [scopeDescriptor.getScopesArray()[0].split('.').pop()]
 
 buildRequestParameters = (filedatas, bufferPosition = [0, 0]) ->
@@ -30,6 +31,15 @@ delFileStatus = (filepath) -> delete fileStatus[filepath]
 getFileStatus = (filepath, status) -> fileStatus[filepath]?[status]
 resetFileStatus = -> fileStatus = {}
 
+class FileStatusDB
+  constructor: (@db = {}) ->
+  setStatus: (filepath, status, value) -> (@db[filepath] || @db[filepath] = {})[status] = value
+  delFileEntry: (filepath) -> delete @db[filepath]
+  getStatus: (filepath, status) -> @db[filepath]?[status]
+  length: -> Object.keys(@db).length
+  clear: -> @db = {}
+
+
 module.exports =
   getEditorData: getEditorData
   getEditorFiletype: getEditorFiletype
@@ -38,3 +48,4 @@ module.exports =
   delFileStatus: delFileStatus
   getFileStatus: getFileStatus
   resetFileStatus: resetFileStatus
+  FileStatusDB: FileStatusDB
