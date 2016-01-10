@@ -25,6 +25,16 @@ buildRequestParameters = (filedatas, bufferPosition = [0, 0]) ->
       filetypes: x.filetypes
   return parameters
 
+unicodeEscaper = (key, value) ->
+  if typeof value is 'string'
+    escapedString = ''
+    for i in [0...value.length]
+      char = value.charAt i
+      charCode = value.charCodeAt i
+      escapedString += if charCode < 0x80 then char else ('\\u' + ('0000' + charCode.toString 16).substr -4)
+    return escapedString
+
+# TODO: remove this code
 fileStatus = {}
 setFileStatus = (filepath, status, value) -> if filepath of fileStatus then fileStatus[filepath][status] = value else fileStatus[filepath] = {status: value}
 delFileStatus = (filepath) -> delete fileStatus[filepath]
@@ -42,6 +52,7 @@ class FileStatusDB
 
 module.exports =
   getEditorData: getEditorData
+  unicodeEscaper: unicodeEscaper
   getEditorFiletype: getEditorFiletype
   buildRequestParameters: buildRequestParameters
   setFileStatus: setFileStatus

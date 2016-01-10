@@ -21,10 +21,9 @@ describe "YCMD autocompletions", ->
     provider.getSuggestions(request)
 
   beforeEachFor = (languageToLoad, withFileExtension, withDefaultProvider = true) ->
-    assurePluginLoadedWithLanguage(languageToLoad)
-    openWorkspaceWithEditor withFileExtension, (newEditor) -> editor = newEditor
-
     beforeEach ->
+      assurePluginLoadedWithLanguage(languageToLoad)
+      openWorkspaceWithEditor withFileExtension, (newEditor) -> editor = newEditor
       withDefaultProvider and runs ->
         provider = atom.packages.getActivePackage('you-complete-me').mainModule.provide()
 

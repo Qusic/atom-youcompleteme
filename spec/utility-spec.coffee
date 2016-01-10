@@ -1,19 +1,16 @@
-{assurePluginLoadedWithLanguage, openWorkspaceWithEditor, waitsForResolve} = require './utility'
+{singleEditorWith, assurePluginLoadedWithLanguage, openWorkspaceWithEditor, waitsForResolve} = require './utility'
 utility = require '../lib/utility'
 
 describe "utility", ->
-  [editor] = []
 
-  assurePluginLoadedWithLanguage('c')
-  openWorkspaceWithEditor fileExtension='c', (openedEditor) -> editor = openedEditor
   beforeEach ->
-    editor.setText("int x = 42;")
+    singleEditorWith fileExtension='c', content="int x = 42;", (editor) -> @editor = editor
 
   it "should get the editor filetype", ->
-    expect(utility.getEditorFiletype(editor)).toEqual(['c'])
+    expect(utility.getEditorFiletype(@editor)).toEqual(['c'])
 
   it "should obtain editor data in the correct format", ->
-    waitsForResolve (utility.getEditorData editor
+    waitsForResolve (utility.getEditorData @editor
         .then (value) ->
           expect(value.filedatas.length).toBe(1)
           finfo = value.filedatas[0]
@@ -23,7 +20,7 @@ describe "utility", ->
       )
 
   it "should be able to build request parameters from editor data", ->
-    waitsForResolve (utility.getEditorData editor
+    waitsForResolve (utility.getEditorData @editor
         .then ({filedatas, bufferPosition}) ->
           p = utility.buildRequestParameters(filedatas, bufferPosition)
           expect(p.column_num).toBe 12
@@ -36,6 +33,9 @@ describe "utility", ->
           expect(d.filetypes.length).toBe 1
           expect(d.filetypes[0]).toEqual 'c'
       )
+
+  it "should manage to esacpe unicode characters", ->
+    
 
 
   describe "FileStatusDB", ->
