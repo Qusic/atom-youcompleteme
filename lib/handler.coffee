@@ -8,10 +8,8 @@ querystring = require 'querystring'
 url = require 'url'
 {BufferedProcess} = require 'atom'
 
-utility = require './utility'
+{jsonUnicodeEscaper} = require './utility'
 debug = require './debug'
-
-ycmdPath = ycmdProcess = port = hmacSecret = null
 
 class YcmdHandler
   hmacSecret = null
@@ -143,7 +141,7 @@ class YcmdHandler
         isPost = method is 'POST'
         requestPayload = ''
         if isPost
-          requestPayload = JSON.stringify parameters, utility.unicodeEscaper if parameters?
+          requestPayload = JSON.stringify parameters, jsonUnicodeEscaper if parameters?
           requestMessage.headers['Content-Type'] = 'application/json'
           requestMessage.headers['Content-Length'] = requestPayload.length
         else

@@ -1,7 +1,21 @@
 {singleEditorWith, assurePluginLoadedWithLanguage, openWorkspaceWithEditor, waitsForResolve} = require './utility'
 utility = require '../lib/utility'
 
-describe "utility", ->
+describe "utilities", ->
+  describe "jsonUnicodeEscaper()", ->
+    beforeEach ->
+      @escape = (value) -> utility.jsonUnicodeEscaper(null, value)
+
+    it "should leave non-unicode alone", ->
+      val = 'hello world'
+      expect(@escape(val)).toEqual(val)
+
+    it "should escape unicode characters", ->
+      smile = 'h😂h'
+      result = @escape(smile)
+      expect(result).toEqual('h\\ud83d\\ude02h')
+
+describe "atom utilities", ->
 
   beforeEach ->
     singleEditorWith fileExtension='c', content="int x = 42;", (editor) -> @editor = editor
@@ -33,10 +47,6 @@ describe "utility", ->
           expect(d.filetypes.length).toBe 1
           expect(d.filetypes[0]).toEqual 'c'
       )
-
-  it "should manage to esacpe unicode characters", ->
-    
-
 
   describe "FileStatusDB", ->
 

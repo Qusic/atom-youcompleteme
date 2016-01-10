@@ -25,7 +25,7 @@ buildRequestParameters = (filedatas, bufferPosition = [0, 0]) ->
       filetypes: x.filetypes
   return parameters
 
-unicodeEscaper = (key, value) ->
+jsonUnicodeEscaper = (key, value) ->
   if typeof value is 'string'
     escapedString = ''
     for i in [0...value.length]
@@ -52,7 +52,7 @@ class FileStatusDB
 
 module.exports =
   getEditorData: getEditorData
-  unicodeEscaper: unicodeEscaper
+  jsonUnicodeEscaper: jsonUnicodeEscaper
   getEditorFiletype: getEditorFiletype
   buildRequestParameters: buildRequestParameters
   setFileStatus: setFileStatus
