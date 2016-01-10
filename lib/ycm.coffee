@@ -19,10 +19,10 @@ class Package
   deactivate: =>
     @reset()
     @configObserver?.dispose()
-    @ycmdHandler.resetYcmdPath null
+    @ycmdHandler.ycmdLauncher.resetYcmdPath null
 
   reset: =>
-    @ycmdHandler.resetYcmdPath ycmdPathFromConfig()
+    @ycmdHandler.ycmdLauncher.resetYcmdPath ycmdPathFromConfig()
     @fileDb.clear()
 
 activate = ->
