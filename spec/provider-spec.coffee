@@ -1,12 +1,11 @@
 {injector} = require '../lib/get-suggestions'
-{waitsForResolve} = require './utility'
 {assurePluginLoadedWithLanguage, openWorkspaceWithEditor} = require './utility'
 
 describe "YCMD autocompletions", ->
   [editor, provider, getYcmdSuggestions] = []
 
   assertSuccessfulCompletions = (assertionCallback, providerInstance = provider) ->
-    waitsForResolve(getCompletions(providerInstance).then assertionCallback)
+    waitsForPromise -> getCompletions(providerInstance).then assertionCallback
 
   getCompletions = (provider) ->
     cursor = editor.getLastCursor()

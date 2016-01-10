@@ -10,7 +10,7 @@ configObserver = null
 class Package
   ycmdPathFromConfig = -> atom.config.get('you-complete-me.legacyYcmdPath')
 
-  constructor: (@ycmdHandler = new handler.YcmdHandler(ycmdPathFromConfig()),
+  constructor: (@ycmdHandler = new handler.YcmdHandler(new handler.OnDemandYcmdLauncher(ycmdPathFromConfig())),
                 @fileDb = new utility.FileStatusDB()) ->
 
   activate: =>

@@ -1,4 +1,4 @@
-{singleEditorWith, assurePluginLoadedWithLanguage, openWorkspaceWithEditor, waitsForResolve} = require './utility'
+{singleEditorWith, assurePluginLoadedWithLanguage, openWorkspaceWithEditor} = require './utility'
 utility = require '../lib/utility'
 
 describe "utilities", ->
@@ -24,17 +24,19 @@ describe "atom utilities", ->
     expect(utility.getEditorFiletype(@editor)).toEqual(['c'])
 
   it "should obtain editor data in the correct format", ->
-    waitsForResolve (utility.getEditorData @editor
+    waitsForPromise ->
+      utility.getEditorData @editor
         .then (value) ->
           expect(value.filedatas.length).toBe(1)
           finfo = value.filedatas[0]
           expect(finfo.filepath).toMatch(/test\.c/)
           expect(finfo.contents).toEqual('int x = 42;')
           expect(finfo.filetypes).toEqual(['c'])
-      )
+
 
   it "should be able to build request parameters from editor data", ->
-    waitsForResolve (utility.getEditorData @editor
+    waitsForPromise ->
+      utility.getEditorData @editor
         .then ({filedatas, bufferPosition}) ->
           p = utility.buildRequestParameters(filedatas, bufferPosition)
           expect(p.column_num).toBe 12
@@ -46,7 +48,6 @@ describe "atom utilities", ->
           expect(d.contents).toEqual "int x = 42;"
           expect(d.filetypes.length).toBe 1
           expect(d.filetypes[0]).toEqual 'c'
-      )
 
   describe "FileStatusDB", ->
 

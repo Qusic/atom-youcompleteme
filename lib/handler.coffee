@@ -12,11 +12,14 @@ url = require 'url'
 debug = require './debug'
 
 class OnDemandYcmdLauncher
-  constructor: (ycmdDirectory, @atom = atom, @BufferedProcess=BufferedProcess) ->
+  constructor: (ycmdDirectory, @net=net, @fs=fs, @atom = atom,
+                @BufferedProcess=BufferedProcess, @setTimeout=setTimeout) ->
     @waitForYcmdToStartInMilliseconds = 1000
-    @resetWithYcmdPath(ycmdDirectory, @net=net, @fs=fs, @atom=atom)
+    @idleSuicideSeconds = 600
+    console.log @setTimeout
+    @resetWithYcmdDirectory(ycmdDirectory)
 
-  resetWithYcmdPath: (@ycmdDirectory) ->
+  resetWithYcmdDirectory: (@ycmdDirectory) ->
     @promise = null
     @process?.kill()
     @process = null
@@ -25,7 +28,7 @@ class OnDemandYcmdLauncher
   assureProcessHasStarted: ->
     return if @promise? and @process?.killed is false then @promise
 
-    findUnusedPort = new Promise (fulfill, reject) ->
+    findUnusedPort = new Promise (fulfill, reject) =>
       @net.createServer()
         .listen 0, ->
           result = this.address().port
@@ -34,14 +37,14 @@ class OnDemandYcmdLauncher
         .on 'error', (error) ->
           reject error
 
-    generateRandomSecret = new Promise (fulfill, reject) ->
+    generateRandomSecret = new Promise (fulfill, reject) =>
       crypto.randomBytes 16, (error, data) ->
         unless error?
           fulfill data
         else
           reject error
 
-    readDefaultOptions = new Promise (fulfill, reject) ->
+    readDefaultOptions = new Promise (fulfill, reject) =>
       defaultOptionsFile = path.resolve @ycmdDirectory, 'ycmd', 'default_settings.json'
       @fs.readFile defaultOptionsFile, encoding: 'utf8', (error, data) ->
         unless error?
@@ -50,7 +53,7 @@ class OnDemandYcmdLauncher
           reject error
 
     port = hmacSecret = null
-    processData = ([unusedPort, randomSecret, options]) -> new Promise (fulfill, reject) ->
+    processData = ([unusedPort, randomSecret, options]) => new Promise (fulfill, reject) =>
       port = unusedPort
       hmacSecret = randomSecret
       options.hmac_secret = hmacSecret.toString 'base64'
@@ -62,24 +65,24 @@ class OnDemandYcmdLauncher
         else
           reject error
 
-    startServer = (optionsFile) -> new Promise (fulfill, reject) ->
+    startServer = (optionsFile) => new Promise (fulfill, reject) =>
       parameters =
         command: @atom.config.get 'you-complete-me.pythonExecutable'
         args: [
           path.resolve @ycmdDirectory, 'ycmd'
           "--port=#{port}"
           "--options_file=#{optionsFile}"
-          '--idle_suicide_seconds=600'
+          "--idle_suicide_seconds=#{@idleSuicideSeconds}"
         ]
         options: {}
-        exit: (status) -> @process = null
+        exit: (status) => @process = null
       parameters.stdout = (output) -> debug.log 'CONSOLE STDOUT', output
       parameters.stderr = (output) -> debug.log 'CONSOLE STDERR', output
-      @process = new @BufferedProcess parameters
-      setTimeout( -> fulfill(['localhost', port, hmacSecret]),
+      @process = @BufferedProcess parameters
+      @setTimeout( -> fulfill(['localhost', port, hmacSecret]),
       @waitForYcmdToStartInMilliseconds)
 
-    Promise.all [findUnusedPort, generateRandomSecret, readDefaultOptions]
+    @promise = Promise.all [findUnusedPort, generateRandomSecret, readDefaultOptions]
       .then processData
       .then startServer
 
@@ -91,11 +94,11 @@ class YcmdHandler
 
   # TODO: remove
   resetYcmdPath: (newYcmdPath) =>
-    @ycmdLauncher.resetWithYcmdPath newYcmdPath
+    @ycmdLauncher.resetWithYcmdDirectory newYcmdPath
 
 
   request: (method, endpoint, parameters = null) => @ycmdLauncher.assureProcessHasStarted().then(
-    (hostname, port, hmacSecret) ->
+    ([hostname, port, hmacSecret]) ->
       generateHmac = (data, encoding) ->
         crypto.createHmac('sha256', hmacSecret).update(data).digest(encoding)
 
@@ -196,3 +199,4 @@ module.exports =
   reset: handler.resetYcmdPath
   request: handler.request,
   YcmdHandler: YcmdHandler
+  OnDemandYcmdLauncher: OnDemandYcmdLauncher
