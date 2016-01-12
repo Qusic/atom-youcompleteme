@@ -16,7 +16,6 @@ class OnDemandYcmdLauncher
                 @BufferedProcess=BufferedProcess, @setTimeout=setTimeout) ->
     @waitForYcmdToStartInMilliseconds = 1000
     @idleSuicideSeconds = 600
-    console.log @setTimeout
     @resetWithYcmdDirectory(ycmdDirectory)
 
   resetWithYcmdDirectory: (@ycmdDirectory) ->

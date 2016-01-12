@@ -18,7 +18,7 @@ describe "utilities", ->
 describe "atom utilities", ->
 
   beforeEach ->
-    singleEditorWith fileExtension='c', content="int x = 42;", (editor) -> @editor = editor
+    singleEditorWith fileExtension='c', content="int x = 42;", (editor) => @editor = editor
 
   it "should get the editor filetype", ->
     expect(utility.getEditorFiletype(@editor)).toEqual(['c'])
