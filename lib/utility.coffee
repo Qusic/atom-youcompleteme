@@ -34,13 +34,6 @@ jsonUnicodeEscaper = (key, value) ->
       escapedString += if charCode < 0x80 then char else ('\\u' + ('0000' + charCode.toString 16).substr -4)
     return escapedString
 
-# TODO: remove this code
-fileStatus = {}
-setFileStatus = (filepath, status, value) -> if filepath of fileStatus then fileStatus[filepath][status] = value else fileStatus[filepath] = {status: value}
-delFileStatus = (filepath) -> delete fileStatus[filepath]
-getFileStatus = (filepath, status) -> fileStatus[filepath]?[status]
-resetFileStatus = -> fileStatus = {}
-
 class FileStatusDB
   constructor: (@db = {}) ->
   setStatus: (filepath, status, value) -> (@db[filepath] || @db[filepath] = {})[status] = value
@@ -55,8 +48,4 @@ module.exports =
   jsonUnicodeEscaper: jsonUnicodeEscaper
   getEditorFiletype: getEditorFiletype
   buildRequestParameters: buildRequestParameters
-  setFileStatus: setFileStatus
-  delFileStatus: delFileStatus
-  getFileStatus: getFileStatus
-  resetFileStatus: resetFileStatus
   FileStatusDB: FileStatusDB

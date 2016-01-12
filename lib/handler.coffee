@@ -192,7 +192,7 @@ class YcmdHandler
 # POST /debug_info
 
 # TODO: remove this
-handler = new YcmdHandler(atom.config.get('you-complete-me.legacyYcmdPath'))
+handler = new YcmdHandler(new OnDemandYcmdLauncher atom.config.get('you-complete-me.legacyYcmdPath'))
 
 module.exports =
   reset: handler.resetYcmdPath

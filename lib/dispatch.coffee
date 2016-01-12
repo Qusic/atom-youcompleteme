@@ -2,16 +2,31 @@
 handler = require './handler'
 {CompositeDisposable} = require 'atom'
 
+processContext = ({editor, scopeDescriptor, bufferPosition}) ->
+  getEditorData(editor, scopeDescriptor, bufferPosition).then ({filedatas, bufferPosition}) ->
+    return {editor, filedatas, bufferPosition}
 
 class Dispatcher
-  constructor: (@handler, @fileStatusDb, @dispatchDispose=new CompositeDisposable()) ->
+  constructor: (@handler, @fileStatusDb, @eventsDisposer=new CompositeDisposable()) ->
 
   buildFileReadyToParse = (handler, filedatas, bufferPosition = [0, 0]) ->
     parameters = buildRequestParameters filedatas, bufferPosition
     parameters.event_name = 'FileReadyToParse'
     handler.request('POST', 'event_notification', parameters)
 
-  processReady: (context) ->
+  buildBufferUnload = (handler, fileStatusDb, filedata) ->
+    parameters = buildRequestParameters [filedata]
+    parameters.event_name = 'BufferUnload'
+    parameters.unloaded_buffer = filedata.filepath
+    handler.request('POST', 'event_notification', parameters).then ->
+      fileStatusDb.delFileEntry filedata.filepath
+
+  _processAfter = (filepath, handler, fileStatusDb) ->
+    fileStatusDb.setStatus filepath, 'pending', false
+    if fileStatusDb.getStatus filepath, 'closing'
+      buildBufferUnload handler, fileStatusDb, fileStatusDb.getStatus(filepath, 'closing')
+
+  processReady: (context) =>
     filepath = context.editor.getPath()
     @fileStatusDb.setStatus filepath, 'ready', true
     buildFileReadyToParse(@handler, context.filedatas, context.bufferPosition).then((response) =>
@@ -24,106 +39,61 @@ class Dispatcher
       throw error
     )
 
-  dispose: ->
-    @dispatchDispose.dispose()
+  processBefore: (needProcessFirstReady) =>
+    handleContext = unless needProcessFirstReady
+      (context) -> context
+    else
+      (context) =>
+        unless @fileStatusDb.getStatus context.editor.getPath(), 'firstready'
+          @processReady(context).then -> context
+        else context
 
-buildBufferUnload = (filedata) ->
-  parameters = buildRequestParameters [filedata]
-  parameters.event_name = 'BufferUnload'
-  parameters.unloaded_buffer = filedata.filepath
-  handler.request('POST', 'event_notification', parameters).then ->
-    @fileStatusDb.delFileEntry filedata.filepath
+    buildBufferVisit = (handler, filedata) ->
+      parameters = buildRequestParameters [filedata]
+      parameters.event_name = 'BufferVisit'
+      handler.request('POST', 'event_notification', parameters)
 
-buildBufferVisit = (filedata) ->
-  parameters = buildRequestParameters [filedata]
-  parameters.event_name = 'BufferVisit'
-  handler.request('POST', 'event_notification', parameters)
+    processVisit = (context) =>
+      return context if @fileStatusDb.getStatus context.editor.getPath(), 'visit'
 
-buildFileReadyToParse = (filedatas, bufferPosition = [0, 0]) ->
-  parameters = buildRequestParameters filedatas, bufferPosition
-  parameters.event_name = 'FileReadyToParse'
-  handler.request('POST', 'event_notification', parameters)
+      buildBufferVisit(@handler, context.filedatas[0]).then =>
+        @fileStatusDb.setStatus context.editor.getPath(), 'visit', true
 
-processContext = ({editor, scopeDescriptor, bufferPosition}) ->
-  getEditorData(editor, scopeDescriptor, bufferPosition).then ({filedatas, bufferPosition}) ->
-    return {editor, filedatas, bufferPosition}
+        bak =
+          filepath: context.editor.getPath()
+          contents: ''
+          filetypes: getEditorFiletype context.editor, context.editor.getRootScopeDescriptor()
 
-dispatchDispose = new CompositeDisposable()
-dispose = ->
-  dispatchDispose.dispose()
+        # add onDidDestroy
+        destroy = =>
+          unless @fileStatusDb.getStatus context.editor.getPath(), 'pending'
+            buildBufferUnload @handler, @fileStatusDb, bak
+          else
+            @fileStatusDb.setStatus context.editor.getPath(), 'closing', bak
 
-processVisit = (context) ->
-  unless @fileStatusDb.getStatus context.editor.getPath(), 'visit'
-    return buildBufferVisit(context.filedatas[0]).then ->
-      @fileStatusDb.setStatus context.editor.getPath(), 'visit', true
+        for fn in ['onDidDestroy', 'onDidChangePath']
+          eventsDisposer.add context.editor[fn] destroy
 
-      bak =
-        filepath: context.editor.getPath()
-        contents: ''
-        filetypes: getEditorFiletype context.editor, context.editor.getRootScopeDescriptor()
+        return context
 
-      # add onDidDestroy
-      destroy = ->
-        unless @fileStatusDb.getStatus context.editor.getPath(), 'pending'
-          buildBufferUnload bak
-        else
-          @fileStatusDb.setStatus context.editor.getPath(), 'closing', bak
+    (context) =>
+      @fileStatusDb.setStatus context.editor.getPath(), 'pending', true
+      processContext context
+        .then processVisit
+        .then handleContext
 
-      dispatchDispose.add context.editor.onDidDestroy destroy
-      dispatchDispose.add context.editor.onDidChangePath destroy
-
+  processAfter: (filepath) =>
+    (context) ->
+      _processAfter filepath, @handler, @fileStatusDb
       return context
-  return context
 
-processReady = (context) ->
-  filepath = context.editor.getPath()
-  @fileStatusDb.setStatus filepath, 'ready', true
-  buildFileReadyToParse(context.filedatas, context.bufferPosition).then((response) ->
-    @fileStatusDb.setStatus filepath, 'ready', false
-    unless response?.exception?
-      @fileStatusDb.setStatus filepath, 'firstready', true
-    return response
-  , (error) ->
-    @fileStatusDb.setStatus filepath, 'ready', false
-    throw error
-  )
+  processAfterError: (filepath) =>
+    (error) ->
+      _processAfter filepath, @handler, @fileStatusDb
+      throw error
 
-processFirstReady = (context) ->
-  unless @fileStatusDb.getStatus context.editor.getPath(), 'firstready'
-    return processReady(context).then -> context
-  return context
-
-processBefore = (needReady) ->
-  choose = unless needReady
-    (context) -> context
-  else
-    processFirstReady
-
-  (context) ->
-    @fileStatusDb.setStatus context.editor.getPath(), 'pending', true
-    processContext context
-      .then processVisit
-      .then choose
-
-_processAfter = (filepath) ->
-  @fileStatusDb.setStatus filepath, 'pending', false
-  if @fileStatusDb.getStatus filepath, 'closing'
-    buildBufferUnload @fileStatusDb.getStatus filepath, 'closing'
-
-processAfter = (filepath) ->
-  (context) ->
-    _processAfter filepath
-    return context
-
-processAfterError = (filepath) ->
-  (error) ->
-    _processAfter filepath
-    throw error
+  dispose: ->
+    @eventsDisposer.dispose()
 
 module.exports =
-  processReady: processReady
-  processBefore: processBefore
-  processAfter: processAfter
-  processAfterError: processAfterError
-  dispose: dispose
   Dispatcher: Dispatcher

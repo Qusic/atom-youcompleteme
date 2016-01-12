@@ -1,4 +1,4 @@
-{injector} = require '../lib/get-suggestions'
+getSuggestions = require '../lib/get-suggestions'
 {assurePluginLoadedWithLanguage, openWorkspaceWithEditor} = require './utility'
 
 describe "YCMD autocompletions", ->
@@ -30,7 +30,9 @@ describe "YCMD autocompletions", ->
 
     beforeEachFor('rust', 'rs', withDefaultProvider = false)
     beforeEach ->
-      provider = getSuggestions: injector()
+      # TODO: setup actual mocks
+      [dispatcher, lexer] = []
+      provider = getSuggestions: getSuggestions.bindTo(dispatcher, lexer)
 
     it "detects rust files ", ->
       editor.setText("""

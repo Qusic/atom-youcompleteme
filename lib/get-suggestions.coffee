@@ -1,15 +1,14 @@
-handler = require './handler'
-utility = require './utility'
+{buildRequestParameters} = require './utility'
 dispatch = require './dispatch'
 lexer = require './lexer'
 path = require 'path'
 
-fetchCompletions = (handler, activatedManually) -> ({editor, filedatas, bufferPosition}) ->
-  parameters = utility.buildRequestParameters filedatas, bufferPosition
+fetchCompletions = (dispatch, activatedManually) -> ({editor, filedatas, bufferPosition}) ->
+  parameters = buildRequestParameters filedatas, bufferPosition
   if activatedManually or atom.config.get 'you-complete-me.forceComplete'
     parameters.force_semantic = true
   parameters.working_dir = path.dirname parameters.filepath
-  handler.request('POST', 'completions', parameters).then (response) ->
+  dispatch.handler.request('POST', 'completions', parameters).then (response) ->
     completions = response?.completions or []
     startColumn = (response?.completion_start_column or (bufferPosition.column + 1)) - 1
     prefix = editor.getTextInBufferRange [[bufferPosition.row, startColumn], bufferPosition]
@@ -73,22 +72,22 @@ convertCompletions = (lexer, {completions, prefix, filetypes}) ->
   if r.length > 0 and Array.isArray(r[0]) then r = r.reduce (prev, cur) -> prev.concat cur
   return r
 
-getSuggestions = (context, dispatch, handler, lexer) ->
+getSuggestions = (context, dispatch, lexer) ->
   return Promise.resolve [] unless context.editor.getPath()?
-  return Promise.resolve [] if utility.setFileStatus context.editor.getPath(), 'ready'
-  return Promise.resolve [] if utility.getFileStatus context.editor.getPath(), 'closing'
+  return Promise.resolve [] if dispatch.fileStatusDb.setFileStatus context.editor.getPath(), 'ready'
+  return Promise.resolve [] if dispatch.fileStatusDb.getFileStatus context.editor.getPath(), 'closing'
 
   filepath = context.editor.getPath()
   Promise.resolve context
     .then dispatch.processBefore(true)
-    .then fetchCompletions(handler, context.activatedManually)
+    .then fetchCompletions(dispatch, context.activatedManually)
     .then dispatch.processAfter(filepath), dispatch.processAfterError(filepath)
     .then convertCompletions lexer
 
-suggestionsInjector = (dispatch, handler, lexer) ->
-  (context) ->
-    getSuggestions(context, dispatch, handler, lexer)
+bindTo = (dispatch, lexer) -> (context) ->
+  getSuggestions(context, dispatch, lexer)
 
+# TODO: get rid of bindTo()
 module.exports =
-  getSuggestions: suggestionsInjector(dispatch, handler, lexer)
-  injector: suggestionsInjector
+  getSuggestions: bindTo(dispatch, lexer)
+  bindTo: bindTo

@@ -30,7 +30,7 @@ describe "Dispatcher", ->
       @context.editor = @editor
       @d = new Dispatcher(handler, new FileStatusDB(), compositeDisposable)
 
-  fdescribe "processReady()", ->
+  describe "processReady()", ->
     status = (_this, status) -> _this.d.fileStatusDb.getStatus _this.context.editor.getPath(), status
 
     it "should mark a file as firstready if everything is good", ->
@@ -57,4 +57,4 @@ describe "Dispatcher", ->
 
     it "disposes its callbacks on dispose", ->
       @d.dispose()
-      expect(@d.dispatchDispose.dispose).toHaveBeenCalled()
+      expect(@d.eventsDisposer.dispose).toHaveBeenCalled()

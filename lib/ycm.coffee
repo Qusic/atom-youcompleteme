@@ -10,8 +10,10 @@ configObserver = null
 class Package
   ycmdPathFromConfig = -> atom.config.get('you-complete-me.legacyYcmdPath')
 
-  constructor: (@ycmdHandler = new handler.YcmdHandler(new handler.OnDemandYcmdLauncher(ycmdPathFromConfig())),
-                @fileDb = new utility.FileStatusDB()) ->
+  constructor: (@fileDb = new utility.FileStatusDB()
+                @ycmdHandler = new handler.YcmdHandler(new handler.OnDemandYcmdLauncher(ycmdPathFromConfig()))
+                @dispatcher = new dispatch.Dispatcher(@ycmdHandler, @fileDb)
+                ) ->
 
   activate: =>
     @configObserver = atom.config.observe 'you-complete-me', @reset
@@ -20,6 +22,7 @@ class Package
     @reset()
     @configObserver?.dispose()
     @ycmdHandler.ycmdLauncher.resetYcmdPath null
+    @dispatcher.dispose()
 
   reset: =>
     @ycmdHandler.ycmdLauncher.resetYcmdPath ycmdPathFromConfig()
@@ -39,6 +42,8 @@ module.exports =
   config: config
   activate: activate
   deactivate: deactivate
+
   provide: -> provider
   provideLinter: -> provider
+
   Package: Package
