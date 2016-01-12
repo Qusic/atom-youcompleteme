@@ -30,14 +30,30 @@ describe "Dispatcher", ->
       @context.editor = @editor
       @d = new Dispatcher(handler, new FileStatusDB(), compositeDisposable)
 
-  describe "processReady()", ->
-    fit "should mark a file as firstready if everything is good", ->
+  fdescribe "processReady()", ->
+    status = (_this, status) -> _this.d.fileStatusDb.getStatus _this.context.editor.getPath(), status
+
+    it "should mark a file as firstready if everything is good", ->
       waitsForPromise =>
         @d.processReady @context
           .then (response) =>
-            status = (status) => @d.fileStatusDb.getStatus @context.editor.getPath(), status
-            expect(status 'ready').toBe false
-            expect(status 'firstready').toBe true
+            expect(status this, 'ready').toBe false
+            expect(status this, 'firstready').toBe true
+
+    for [errorDescription, expectRejection, enableError] in [
+      ["response has exception", false, (h) -> h.setResponseException 'exception in response']
+      ["response failed entirely", true, (h) -> h.setShouldFailRequestWithError 'network failure']
+    ]
+      ((enableError, expectRejection) ->
+        it "should not mark it as firstready if " + errorDescription, ->
+          console.log expectRejection, errorDescription
+          enableError @d.handler
+          waitsForPromise shouldReject: expectRejection, =>
+            @d.processReady @context
+              .then (response) =>
+                expect(status this, 'ready').toBe false
+                expect(status this, 'firstready').toBeFalsy()
+        )(enableError, expectRejection)
 
     it "disposes its callbacks on dispose", ->
       @d.dispose()
