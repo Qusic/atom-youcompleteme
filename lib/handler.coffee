@@ -94,6 +94,7 @@ class YcmdHandler
   # TODO: remove
   resetYcmdPath: (newYcmdPath) =>
     @ycmdLauncher.resetWithYcmdDirectory newYcmdPath
+    this
 
 
   request: (method, endpoint, parameters = null) => @ycmdLauncher.assureProcessHasStarted().then(

@@ -1,8 +1,24 @@
-handler = require './handler'
-utility = require './utility'
+{buildRequestParameters} = require './utility'
 dispatch = require './dispatch'
 
-commands =
+class Menu
+  constructor: (@dispatch, @commands=Menu.commands) ->
+  register: =>
+    generatedCommands = {}
+    generatedMenus = []
+
+    for key, command of @commands
+      generatedCommands["you-complete-me:#{key}"] = ((command) => (event) => @dispatch.runCommand command, Menu.handler)(command)
+      generatedMenus.push command: "you-complete-me:#{key}", label: command
+    atom.commands.add 'atom-text-editor', generatedCommands
+    @contextMenu = atom.contextMenu.add 'atom-text-editor': [label: 'YouCompleteMe', submenu: generatedMenus]
+    this
+
+  deregister: =>
+    @contextMenu?.dispose()
+    this
+
+Menu.commands =
   'get-type': 'GetType'
   'get-parent': 'GetParent'
   'go-to-declaration': 'GoToDeclaration'
@@ -12,41 +28,17 @@ commands =
   'go-to-include': 'GoToInclude'
   #'fix-it': 'FixIt' # TODO
   'clear-compilation-flag-cache': 'ClearCompilationFlagCache'
-contextMenu = null
 
-runCommand = (command) ->
-  editor = atom.workspace.getActiveTextEditor()
-  return Promise.resolve() unless editor.getPath()?
-  return Promise.resolve() if utility.getFileStatus editor.getPath(), 'ready'
-  return Promise.resolve() if utility.getFileStatus editor.getPath(), 'closing'
-
-  filepath = editor.getPath()
-  Promise.resolve {editor}
-    .then dispatch.processBefore(true)
-    .then ({filedatas, bufferPosition}) ->
-      parameters = utility.buildRequestParameters filedatas, bufferPosition
-      parameters.command_arguments = [command]
-      handler.request('POST', 'run_completer_command', parameters).then (response) ->
-        if command.startsWith 'Get'
-          if response?.message?
-            atom.notifications.addInfo "[YCM] #{command}", detail: response.message
-        else if command.startsWith 'GoTo'
-          if response?.filepath?
-            atom.workspace.open response.filepath, initialLine: response.line_num - 1, initialColumn: response.column_num - 1
-    .then dispatch.processAfter(filepath), dispatch.processAfterError(filepath)
-
-register = ->
-  generatedCommands = {}
-  generatedMenus = []
-  for key, command of commands
-    generatedCommands["you-complete-me:#{key}"] = ((command) -> (event) -> runCommand command)(command)
-    generatedMenus.push command: "you-complete-me:#{key}", label: command
-  atom.commands.add 'atom-text-editor', generatedCommands
-  contextMenu = atom.contextMenu.add 'atom-text-editor': [label: 'YouCompleteMe', submenu: generatedMenus]
-
-deregister = ->
-  contextMenu?.dispose()
+Menu.handler = ({response, command}) ->
+  fmt = -> "[YCM] #{command}"
+  if command.startsWith 'Get'
+    if response?.message?
+      atom.notifications.addInfo fmt(), detail: response.message
+  else if command.startsWith 'GoTo'
+    if response?.filepath?
+      atom.workspace.open response.filepath, initialLine: response.line_num - 1, initialColumn: response.column_num - 1
+  else
+    atom.notifications.addError fmt()
 
 module.exports =
-  register: register
-  deregister: deregister
+  Menu: Menu

@@ -95,5 +95,21 @@ class Dispatcher
   dispose: ->
     @eventsDisposer.dispose()
 
+  runCommand: (command, responseHandler) =>
+    editor = atom.workspace.getActiveTextEditor()
+    return Promise.resolve() unless editor.getPath()?
+    return Promise.resolve() if @fileStatusDb.getStatus editor.getPath(), 'ready'
+    return Promise.resolve() if @fileStatusDb.getStatus editor.getPath(), 'closing'
+
+    filepath = editor.getPath()
+    Promise.resolve {editor}
+      .then @processBefore(true)
+      .then ({filedatas, bufferPosition}) =>
+        parameters = buildRequestParameters filedatas, bufferPosition
+        parameters.command_arguments = [command]
+        @handler.request('POST', 'run_completer_command', parameters).then (response) ->
+          responseHandler response: response, command: command
+      .then @processAfter(filepath), @processAfterError(filepath)
+
 module.exports =
   Dispatcher: Dispatcher

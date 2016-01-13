@@ -89,3 +89,6 @@ describe "OnDemandYcmdLauncher", ->
     waitsForPromise =>
       @launcher.assureProcessHasStarted().then ([hostname, port, hmacSecret]) ->
           expect(hmacSecret).toBe previousSecret
+
+describe 'YcmdLauncher', ->
+  # TODO: test request
