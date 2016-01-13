@@ -31,12 +31,16 @@ Menu.commands =
 
 Menu.handler = ({response, command}) ->
   fmt = -> "[YCM] #{command}"
+  noResult = -> atom.notifications.addInfo fmt(), detail: 'no result'
+
   if command.startsWith 'Get'
     if response?.message?
       atom.notifications.addInfo fmt(), detail: response.message
+    else noResult()
   else if command.startsWith 'GoTo'
     if response?.filepath?
       atom.workspace.open response.filepath, initialLine: response.line_num - 1, initialColumn: response.column_num - 1
+    else noResult()
   else
     atom.notifications.addError fmt()
 

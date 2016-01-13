@@ -44,13 +44,16 @@ describe "Menu", ->
 
   for label, command of Menu.commands
     makeAssertions = (command, {mustOpenWorkspace, mustAddInfo}) -> ->
-      Menu.handler command: command, response: response for response in responses
+      asserter = (response) ->
+        Menu.handler command: command, response: response
+        expect(atom.workspace.open.callCount +
+              atom.notifications.addInfo.callCount +
+              atom.notifications.addError.callCount).toBeGreaterThan 0
+
+      asserter response for response in responses
 
       expect(atom.notifications.addInfo).toHaveBeenCalled() if mustAddInfo
       expect(atom.workspace.open).toHaveBeenCalled() if mustOpenWorkspace
-      expect(atom.workspace.open.callCount +
-            atom.notifications.addInfo.callCount +
-            atom.notifications.addError.callCount).toBeGreaterThan 0
 
     if command.startsWith 'GoTo'
       customAssertionHandler = makeAssertions command, mustOpenWorkspace: true, mustAddInfo: false
