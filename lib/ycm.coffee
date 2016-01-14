@@ -1,26 +1,44 @@
-handler = require './handler'
-provider = require './provider'
+{YcmdHandler, YcmdLauncher} = require './handler'
+{autocompletePlusConfiguration, linterConfiguration} = require './provider'
+{Menu} = require './menu'
+{Dispatcher} = require './dispatch'
+{FileStatusDB} = require './utility'
 config = require './config'
-menu = require './menu'
-#updateDependencies = require './update-dependencies'
-dispatch = require './dispatch'
+lexer = require './lexer'
 
-configObserver = null
 
-activate = ->
-  configObserver = atom.config.observe 'you-complete-me', handler.reset
-  menu.register()
-  #updateDependencies()
+class Package
+  ycmdPathFromConfig = -> atom.config.get('you-complete-me.legacyYcmdPath')
 
-deactivate = ->
-  configObserver?.dispose()
-  menu.deregister()
-  handler.reset()
-  dispatch.dispose()
+  constructor: (@fileDb = new FileStatusDB()
+                @ycmdHandler = new YcmdHandler(new YcmdLauncher(ycmdPathFromConfig()))
+                @dispatcher = new Dispatcher(@ycmdHandler, @fileDb)
+                @menu = new Menu(@dispatcher)) ->
+
+  activate: =>
+    @subscriptions = atom.config.observe 'you-complete-me', @reset
+    @menu.register()
+
+  deactivate: =>
+    @reset()
+    @subscriptions?.dispose()
+    @menu?.deregister()
+    @dispatcher?.dispose()
+    @ycmdHandler?.ycmdLauncher.resetYcmdPath null
+
+  reset: =>
+    @ycmdycmdLauncher.resetYcmdPath ycmdPathFromConfig()
+    @fileDb.clear()
+
+
+p = new Package()
 
 module.exports =
   config: config
-  activate: activate
-  deactivate: deactivate
-  provide: -> provider
-  provideLinter: -> provider
+  activate: p.activate
+  deactivate: p.deactivate
+
+  provideSuggestions: -> autocompletePlusConfiguration(p.dispatcher)
+  provideLinter: -> linterConfiguration(p.dispatcher, lexer)
+
+  Package: Package

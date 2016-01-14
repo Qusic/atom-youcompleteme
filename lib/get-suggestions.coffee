@@ -1,21 +1,19 @@
-handler = require './handler'
-utility = require './utility'
-dispatch = require './dispatch'
+{buildRequestParameters} = require './utility'
 lexer = require './lexer'
 path = require 'path'
 
-fetchCompletions = (activatedManually) -> ({editor, filedatas, bufferPosition}) ->
-  parameters = utility.buildRequestParameters filedatas, bufferPosition
+fetchCompletions = (dispatcher, activatedManually) -> ({editor, filedatas, bufferPosition}) ->
+  parameters = buildRequestParameters filedatas, bufferPosition
   if activatedManually or atom.config.get 'you-complete-me.forceComplete'
     parameters.force_semantic = true
   parameters.working_dir = path.dirname parameters.filepath
-  handler.request('POST', 'completions', parameters).then (response) ->
+  dispatcher.handler.request('POST', 'completions', parameters).then (response) ->
     completions = response?.completions or []
     startColumn = (response?.completion_start_column or (bufferPosition.column + 1)) - 1
     prefix = editor.getTextInBufferRange [[bufferPosition.row, startColumn], bufferPosition]
     return {completions, prefix, filetypes: filedatas[0].filetypes}
 
-convertCompletions = ({completions, prefix, filetypes}) ->
+convertCompletions = (lexer, {completions, prefix, filetypes}) ->
   converters =
     general: (completion) ->
       suggestion =
@@ -54,10 +52,18 @@ convertCompletions = ({completions, prefix, filetypes}) ->
       suggestion.type = completion.display_string.substr(0, (completion.display_string.indexOf ': '))
       return suggestion
 
+    rust: (completion) ->
+      suggestion = converters.general completion
+      # suggestion.snippet = suggestion.text
+      suggestion.description = suggestion.leftLabel
+      delete suggestion.text
+      suggestion
+
   converter = converters[(
     switch filetypes[0]
       when 'c', 'cpp', 'objc', 'objcpp' then 'clang'
       when 'python' then 'python'
+      when 'rust' then 'rust'
       else 'general'
   )]
 
@@ -65,16 +71,17 @@ convertCompletions = ({completions, prefix, filetypes}) ->
   if r.length > 0 and Array.isArray(r[0]) then r = r.reduce (prev, cur) -> prev.concat cur
   return r
 
-getSuggestions = (context) ->
+getSuggestions = (context, dispatcher, lexer = lexer) ->
   return Promise.resolve [] unless context.editor.getPath()?
-  return Promise.resolve [] if utility.getFileStatus context.editor.getPath(), 'ready'
-  return Promise.resolve [] if utility.getFileStatus context.editor.getPath(), 'closing'
+  return Promise.resolve [] if dispatcher.fileStatusDb.setFileStatus context.editor.getPath(), 'ready'
+  return Promise.resolve [] if dispatcher.fileStatusDb.getFileStatus context.editor.getPath(), 'closing'
 
   filepath = context.editor.getPath()
   Promise.resolve context
-    .then dispatch.processBefore(true)
-    .then fetchCompletions(context.activatedManually)
-    .then dispatch.processAfter(filepath), dispatch.processAfterError(filepath)
-    .then convertCompletions
+    .then dispatcher.processBefore(true)
+    .then fetchCompletions(dispatcher, context.activatedManually)
+    .then dispatcher.processAfter(filepath), dispatcher.processAfterError(filepath)
+    .then convertCompletions lexer
 
-module.exports = getSuggestions
+module.exports =
+  getSuggestions: getSuggestions

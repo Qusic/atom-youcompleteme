@@ -9,7 +9,8 @@ getEditorData = (editor = atom.workspace.getActiveTextEditor(), scopeDescriptor 
 
   Promise.resolve {filedatas, bufferPosition}
 
-getEditorFiletype = (scopeDescriptor = atom.workspace.getActiveTextEditor().getRootScopeDescriptor()) ->
+getEditorFiletype = (editor = atom.workspace.getActiveTextEditor(),
+                     scopeDescriptor = editor.getRootScopeDescriptor()) ->
   return [scopeDescriptor.getScopesArray()[0].split('.').pop()]
 
 buildRequestParameters = (filedatas, bufferPosition = [0, 0]) ->
@@ -24,17 +25,27 @@ buildRequestParameters = (filedatas, bufferPosition = [0, 0]) ->
       filetypes: x.filetypes
   return parameters
 
-fileStatus = {}
-setFileStatus = (filepath, status, value) -> if filepath of fileStatus then fileStatus[filepath][status] = value else fileStatus[filepath] = {status: value}
-delFileStatus = (filepath) -> delete fileStatus[filepath]
-getFileStatus = (filepath, status) -> fileStatus[filepath]?[status]
-resetFileStatus = -> fileStatus = {}
+jsonUnicodeEscaper = (key, value) ->
+  if typeof value is 'string'
+    escapedString = ''
+    for i in [0...value.length]
+      char = value.charAt i
+      charCode = value.charCodeAt i
+      escapedString += if charCode < 0x80 then char else ('\\u' + ('0000' + charCode.toString 16).substr -4)
+    return escapedString
+
+class FileStatusDB
+  constructor: (@db = {}) ->
+  setStatus: (filepath, status, value) -> (@db[filepath] || @db[filepath] = {})[status] = value
+  delFileEntry: (filepath) -> delete @db[filepath]
+  getStatus: (filepath, status) -> @db[filepath]?[status]
+  length: -> Object.keys(@db).length
+  clear: -> @db = {}
+
 
 module.exports =
   getEditorData: getEditorData
+  jsonUnicodeEscaper: jsonUnicodeEscaper
   getEditorFiletype: getEditorFiletype
   buildRequestParameters: buildRequestParameters
-  setFileStatus: setFileStatus
-  delFileStatus: delFileStatus
-  getFileStatus: getFileStatus
-  resetFileStatus: resetFileStatus
+  FileStatusDB: FileStatusDB

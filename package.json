@@ -1,7 +1,7 @@
 {
   "name": "you-complete-me",
   "main": "./lib/ycm",
-  "version": "0.6.5",
+  "version": "0.7.0",
   "description": "YouCompleteMe for Atom Editor",
   "repository": "https://github.com/Qusic/atom-youcompleteme",
   "license": "MIT",
@@ -13,7 +13,7 @@
   "providedServices": {
     "autocomplete.provider": {
       "versions": {
-        "2.0.0": "provide"
+        "2.0.0": "provideSuggestions"
       }
     },
     "linter": {
