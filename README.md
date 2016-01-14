@@ -51,3 +51,9 @@ For detailed instructions and troubleshooting on building ycmd, see [YouComplete
 ### It always gives an error stating that ycmd needs to be recompiled.
 
 Check your Python Executable config and make sure you are using python2 instead of python3.
+
+## Known Issues
+
+* **When supported languages are changed in the configuration, the plugin must be reloaded**
+  - otherwise, the change is not picked up. This is a limitation of *autocompete-plus*, which caches this information.
+  - this limitation affects the autocomplete-plus suggestions, as well as lints

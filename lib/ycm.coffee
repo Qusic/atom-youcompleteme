@@ -1,9 +1,10 @@
 {YcmdHandler, YcmdLauncher} = require './handler'
-provider = require './provider'
-config = require './config'
+{autocompletePlusConfiguration, linterConfiguration} = require './provider'
 {Menu} = require './menu'
 {Dispatcher} = require './dispatch'
 {FileStatusDB} = require './utility'
+config = require './config'
+lexer = require './lexer'
 
 
 class Package
@@ -11,17 +12,16 @@ class Package
 
   constructor: (@fileDb = new FileStatusDB()
                 @ycmdHandler = new YcmdHandler(new YcmdLauncher(ycmdPathFromConfig()))
-                @dispatcher = new Dispatcher(@ycmdHandler, @fileDb),
-                @menu = new Menu(@dispatcher)
-                ) ->
+                @dispatcher = new Dispatcher(@ycmdHandler, @fileDb)
+                @menu = new Menu(@dispatcher)) ->
 
   activate: =>
-    @configObserver = atom.config.observe 'you-complete-me', @reset
+    @subscriptions = atom.config.observe 'you-complete-me', @reset
     @menu.register()
 
   deactivate: =>
     @reset()
-    @configObserver?.dispose()
+    @subscriptions?.dispose()
     @menu?.deregister()
     @dispatcher?.dispose()
     @ycmdHandler?.ycmdLauncher.resetYcmdPath null
@@ -38,7 +38,7 @@ module.exports =
   activate: p.activate
   deactivate: p.deactivate
 
-  provide: -> provider
-  provideLinter: -> provider
+  provideSuggestions: -> autocompletePlusConfiguration(p.dispatcher)
+  provideLinter: -> linterConfiguration(p.dispatcher, lexer)
 
   Package: Package

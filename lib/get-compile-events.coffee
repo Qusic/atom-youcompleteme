@@ -1,4 +1,4 @@
-getCompileEvents = (context, dispatcher) ->
+getCompileEvents = (editor, dispatcher) ->
   fetchEvents = (context) ->
     dispatcher.processReady(context).then (response) ->
       events = if Array.isArray response then response else []
@@ -20,12 +20,12 @@ getCompileEvents = (context, dispatcher) ->
       filePath: event.location.filepath
       range: extractRange event
 
-  return Promise.resolve [] unless context.getPath()?
-  return Promise.resolve [] if dispatcher.fileStatusDb.getStatus context.getPath(), 'ready'
-  return Promise.resolve [] if dispatcher.fileStatusDb.getStatus context.getPath(), 'closing'
+  return Promise.resolve [] unless editor.getPath()?
+  return Promise.resolve [] if dispatcher.fileStatusDb.getStatus editor.getPath(), 'ready'
+  return Promise.resolve [] if dispatcher.fileStatusDb.getStatus editor.getPath(), 'closing'
 
-  filepath = context.getPath()
-  Promise.resolve {editor: context}
+  filepath = editor.getPath()
+  Promise.resolve {editor: editor}
     .then dispatcher.processBefore(false)
     .then fetchEvents
     .then dispatcher.processAfter(filepath), dispatcher.processAfterError(filepath)
