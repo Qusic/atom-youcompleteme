@@ -1,9 +1,6 @@
-utility = require './utility'
-dispatch = require './dispatch'
-
-getCompileEvents = (context, dispatch) ->
+getCompileEvents = (context, dispatcher) ->
   fetchEvents = (context) ->
-    dispatch.processReady(context).then (response) ->
+    dispatcher.processReady(context).then (response) ->
       events = if Array.isArray response then response else []
       return {events}
 
@@ -24,20 +21,16 @@ getCompileEvents = (context, dispatch) ->
       range: extractRange event
 
   return Promise.resolve [] unless context.getPath()?
-  return Promise.resolve [] if dispatch.fileStatusDb.getStatus context.getPath(), 'ready'
-  return Promise.resolve [] if dispatch.fileStatusDb.getStatus context.getPath(), 'closing'
+  return Promise.resolve [] if dispatcher.fileStatusDb.getStatus context.getPath(), 'ready'
+  return Promise.resolve [] if dispatcher.fileStatusDb.getStatus context.getPath(), 'closing'
 
   filepath = context.getPath()
   Promise.resolve {editor: context}
-    .then dispatch.processBefore(false)
+    .then dispatcher.processBefore(false)
     .then fetchEvents
-    .then dispatch.processAfter(filepath), dispatch.processAfterError(filepath)
+    .then dispatcher.processAfter(filepath), dispatcher.processAfterError(filepath)
     .then convertEvents
 
-bindTo = (dispatch) -> (context) ->
-  getCompileEvents context, dispatch
 
-# TODO: get rid of bindTo
 module.exports =
-  getCompileEvents: bindTo(dispatch)
-  bindTo: bindTo
+  getCompileEvents: getCompileEvents

@@ -1,5 +1,5 @@
 {getSuggestions} = require './get-suggestions'
-getCompileEvents = require './get-compile-events'
+{getCompileEvents} = require './get-compile-events'
 
 module.exports =
   selector: (

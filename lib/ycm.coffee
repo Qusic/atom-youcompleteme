@@ -5,7 +5,6 @@ config = require './config'
 {Dispatcher} = require './dispatch'
 {FileStatusDB} = require './utility'
 
-configObserver = null
 
 class Package
   ycmdPathFromConfig = -> atom.config.get('you-complete-me.legacyYcmdPath')
@@ -30,6 +29,7 @@ class Package
   reset: =>
     @ycmdycmdLauncher.resetYcmdPath ycmdPathFromConfig()
     @fileDb.clear()
+
 
 p = new Package()
 

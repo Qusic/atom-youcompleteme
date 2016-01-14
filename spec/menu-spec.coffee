@@ -42,19 +42,19 @@ describe "Menu", ->
     {filepath: 'bogus.path'}
   ]
 
+  makeAssertions = (command, {mustOpenWorkspace, mustAddInfo}) -> ->
+    asserter = (response) ->
+      Menu.handler command: command, response: response
+      expect(atom.workspace.open.callCount +
+            atom.notifications.addInfo.callCount +
+            atom.notifications.addError.callCount).toBeGreaterThan 0
+
+    asserter response for response in responses
+
+    expect(atom.notifications.addInfo).toHaveBeenCalled() if mustAddInfo
+    expect(atom.workspace.open).toHaveBeenCalled() if mustOpenWorkspace
+
   for label, command of Menu.commands
-    makeAssertions = (command, {mustOpenWorkspace, mustAddInfo}) -> ->
-      asserter = (response) ->
-        Menu.handler command: command, response: response
-        expect(atom.workspace.open.callCount +
-              atom.notifications.addInfo.callCount +
-              atom.notifications.addError.callCount).toBeGreaterThan 0
-
-      asserter response for response in responses
-
-      expect(atom.notifications.addInfo).toHaveBeenCalled() if mustAddInfo
-      expect(atom.workspace.open).toHaveBeenCalled() if mustOpenWorkspace
-
     if command.startsWith 'GoTo'
       customAssertionHandler = makeAssertions command, mustOpenWorkspace: true, mustAddInfo: false
       it "'#{command}' should try to open a workspace", customAssertionHandler
