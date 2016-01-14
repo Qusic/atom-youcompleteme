@@ -1,6 +1,6 @@
-{OnDemandYcmdLauncher} = require '../lib/handler'
+{YcmdLauncher} = require '../lib/handler'
 
-describe "OnDemandYcmdLauncher", ->
+describe "YcmdLauncher", ->
   dummyDirectory = '/directory/of/ycmd/which/does/not/matter/here'
   defaultPort = 42
 
@@ -47,7 +47,7 @@ describe "OnDemandYcmdLauncher", ->
     @serverMock = new ServerMock(shouldFail: false)
     @net.createServer.andReturn @serverMock
 
-    @launcher = new OnDemandYcmdLauncher(dummyDirectory, @net, @fs, @atom, BufferedProcess, (cb) -> cb())
+    @launcher = new YcmdLauncher(dummyDirectory, @net, @fs, @atom, BufferedProcess, (cb) -> cb())
 
 
   it "should start out without anything as it's lazy", ->

@@ -1,47 +1,42 @@
-handler = require './handler'
+{YcmdHandler, YcmdLauncher} = require './handler'
 provider = require './provider'
 config = require './config'
-menu = require './menu'
-dispatch = require './dispatch'
-utility = require './utility'
+{Menu} = require './menu'
+{Dispatcher} = require './dispatch'
+{FileStatusDB} = require './utility'
 
 configObserver = null
 
 class Package
   ycmdPathFromConfig = -> atom.config.get('you-complete-me.legacyYcmdPath')
 
-  constructor: (@fileDb = new utility.FileStatusDB()
-                @ycmdHandler = new handler.YcmdHandler(new handler.OnDemandYcmdLauncher(ycmdPathFromConfig()))
-                @dispatcher = new dispatch.Dispatcher(@ycmdHandler, @fileDb)
+  constructor: (@fileDb = new FileStatusDB()
+                @ycmdHandler = new YcmdHandler(new YcmdLauncher(ycmdPathFromConfig()))
+                @dispatcher = new Dispatcher(@ycmdHandler, @fileDb),
+                @menu = new Menu(@dispatcher)
                 ) ->
 
   activate: =>
     @configObserver = atom.config.observe 'you-complete-me', @reset
+    @menu.register()
 
   deactivate: =>
     @reset()
     @configObserver?.dispose()
-    @ycmdHandler.ycmdLauncher.resetYcmdPath null
-    @dispatcher.dispose()
+    @menu?.deregister()
+    @dispatcher?.dispose()
+    @ycmdHandler?.ycmdLauncher.resetYcmdPath null
 
   reset: =>
-    @ycmdHandler.ycmdLauncher.resetYcmdPath ycmdPathFromConfig()
+    @ycmdycmdLauncher.resetYcmdPath ycmdPathFromConfig()
     @fileDb.clear()
 
-activate = ->
-  configObserver = atom.config.observe 'you-complete-me', handler.reset
-  menu.register()
-
-deactivate = ->
-  configObserver?.dispose()
-  menu.deregister()
-  handler.reset()
-  dispatch.dispose()
+p = new Package()
 
 module.exports =
   config: config
-  activate: activate
-  deactivate: deactivate
+  activate: p.activate
+  deactivate: p.deactivate
 
   provide: -> provider
   provideLinter: -> provider

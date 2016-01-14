@@ -11,7 +11,7 @@ url = require 'url'
 {jsonUnicodeEscaper} = require './utility'
 debug = require './debug'
 
-class OnDemandYcmdLauncher
+class YcmdLauncher
   constructor: (ycmdDirectory, @net=net, @fs=fs, @atom = atom,
                 @BufferedProcess=BufferedProcess, @setTimeout=setTimeout) ->
     @waitForYcmdToStartInMilliseconds = 1000
@@ -193,10 +193,10 @@ class YcmdHandler
 # POST /debug_info
 
 # TODO: remove this
-handler = new YcmdHandler(new OnDemandYcmdLauncher atom.config.get('you-complete-me.legacyYcmdPath'))
+handler = new YcmdHandler(new YcmdLauncher atom.config.get('you-complete-me.legacyYcmdPath'))
 
 module.exports =
   reset: handler.resetYcmdPath
   request: handler.request,
   YcmdHandler: YcmdHandler
-  OnDemandYcmdLauncher: OnDemandYcmdLauncher
+  YcmdLauncher: YcmdLauncher
