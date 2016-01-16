@@ -16,27 +16,32 @@ observeEditors = ->
     path = editor.getPath() or utility.getEditorTmpFilepath editor
     enabled = false
     isEnabled = -> utility.isEnabledForScope editor.getRootScopeDescriptor()
-    onVisit = -> emitEvent editor, 'BufferVisit'
-    onUnload = -> emitEvent editor, 'BufferUnload', unloaded_buffer: path
+    onBufferVisit = -> emitEvent editor, 'BufferVisit'
+    onBufferUnload = -> emitEvent editor, 'BufferUnload', unloaded_buffer: path
+    onInsertLeave = -> emitEvent editor, 'InsertLeave'
+    onCurrentIdentifierFinished = -> emitEvent editor, 'CurrentIdentifierFinished'
 
-    grammarObserver = editor.observeGrammar ->
+    observers = []
+    observers.push editor.observeGrammar ->
       if isEnabled()
-        onVisit()
+        onBufferVisit()
         enabled = true
       else
-        onUnload() if enabled
+        onBufferUnload() if enabled
         enabled = false
-    pathObserver = editor.onDidChangePath ->
+    observers.push editor.onDidChangePath ->
       if enabled
-        onUnload()
-        onVisit()
+        onBufferUnload()
+        onBufferVisit()
       path = editor.getPath()
-    destroyObserver = editor.onDidDestroy ->
+    observers.push editor.onDidStopChanging ->
       if enabled
-        onUnload()
-      grammarObserver.dispose()
-      pathObserver.dispose()
-      destroyObserver.dispose()
+        onInsertLeave()
+        onCurrentIdentifierFinished()
+    observers.push editor.onDidDestroy ->
+      if enabled
+        onBufferUnload()
+      observer.dispose() for observer in observers
 
 observeConfig = ->
   atom.config.observe 'you-complete-me', (value) ->
