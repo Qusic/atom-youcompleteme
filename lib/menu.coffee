@@ -36,7 +36,7 @@ register = ->
   contextMenu = atom.contextMenu.add 'atom-text-editor': [label: 'YouCompleteMe', submenu: generatedMenus]
 
 deregister = ->
-  contextMenu?.dispose()
+  contextMenu.dispose()
 
 module.exports =
   register: register
