@@ -1,18 +1,16 @@
+provider = require './provider'
 handler = require './handler'
 config = require './config'
+event = require './event'
 menu = require './menu'
 
-provider = null
-configObserver = null
-
 activate = ->
-  provider = require './provider'
-  configObserver = atom.config.observe 'you-complete-me', handler.reset
+  event.register()
   menu.register()
   return
 
 deactivate = ->
-  configObserver?.dispose()
+  event.deregister()
   menu.deregister()
   handler.reset()
   return

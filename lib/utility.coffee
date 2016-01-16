@@ -2,6 +2,9 @@ os = require 'os'
 path = require 'path'
 {File, Point} = require 'atom'
 
+getEditorTmpFilepath = (editor) ->
+  return path.resolve os.tmpdir(), "AtomYcmBuffer-#{editor.getBuffer().getId()}"
+
 getEditorData = (editor = atom.workspace.getActiveTextEditor(), scopeDescriptor = editor.getRootScopeDescriptor()) ->
   filepath = editor.getPath()
   contents = editor.getText()
@@ -11,7 +14,7 @@ getEditorData = (editor = atom.workspace.getActiveTextEditor(), scopeDescriptor 
     return Promise.resolve {filepath, contents, filetypes, bufferPosition}
   else
     return new Promise (fulfill, reject) ->
-      filepath = path.resolve os.tmpdir(), "AtomYcmBuffer-#{editor.id}"
+      filepath = getEditorTmpFilepath editor
       file = new File filepath
       file.write contents
         .then -> fulfill {filepath, contents, filetypes, bufferPosition}
@@ -34,7 +37,15 @@ buildRequestParameters = (filepath, contents, filetypes = [], bufferPosition = n
       filetypes: getScopeFiletypes editor.getRootScopeDescriptor()
   return parameters
 
+isEnabledForScope = (scopeDescriptor) ->
+  enabledFiletypes = atom.config.get('you-complete-me.enabledFiletypes').split(',').map (filetype) -> filetype.trim()
+  filetypes = getScopeFiletypes scopeDescriptor
+  filetype = filetypes.find (filetype) -> enabledFiletypes.indexOf(filetype) >= 0
+  return if filetype? then true else false
+
 module.exports =
+  getEditorTmpFilepath: getEditorTmpFilepath
   getEditorData: getEditorData
   getScopeFiletypes: getScopeFiletypes
   buildRequestParameters: buildRequestParameters
+  isEnabledForScope: isEnabledForScope
