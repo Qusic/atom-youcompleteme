@@ -57,10 +57,10 @@ convertCompletions = ({completions, prefix, filetypes}) ->
 
   completions.map converter
 
-getSuggestions = (context) ->
+getCompletions = (context) ->
   Promise.resolve context
     .then processContext
     .then fetchCompletions
     .then convertCompletions
 
-module.exports = getSuggestions
+module.exports = getCompletions
