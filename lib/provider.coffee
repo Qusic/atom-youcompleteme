@@ -1,22 +1,28 @@
-getSuggestions = require './get-suggestions'
-getCompileEvents = require './get-compile-events'
+utility = require './utility'
+getCompletions = require './get-completions'
+getIssues = require './get-issues'
+
+enabledForScope = (scopeDescriptor) ->
+
 
 module.exports =
-  selector: atom.config.get('you-complete-me.enabledScopes')
+  selector: '*'
   inclusionPriority: 2
   suggestionPriority: 2
   excludeLowerPriority: false
 
-  grammarScopes: atom.config.get('you-complete-me.enabledScopes').split(',').map (scope) -> scope.trim().replace(/^\./, '')
+  grammarScopes: ['*']
   scope: 'file'
-  lintOnFly: atom.config.get 'you-complete-me.lintDuringEdit'
+  lintOnFly: true
 
   getSuggestions: (context) ->
-    getSuggestions(context).catch (error) ->
+    return [] unless utility.isEnabledForScope context.scopeDescriptor
+    getCompletions(context).catch (error) ->
       console.error '[YCM-ERROR]', error
       return []
 
   lint: (editor) ->
-    getCompileEvents(editor).catch (error) ->
+    return [] unless utility.isEnabledForScope editor.getRootScopeDescriptor()
+    getIssues(editor).catch (error) ->
       console.error '[YCM-ERROR]', error
       return []

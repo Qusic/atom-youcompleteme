@@ -2,15 +2,16 @@ module.exports =
   pythonExecutable:
     type: 'string'
     default: 'python'
+    order: 1
   ycmdPath:
     type: 'string'
     default: '/usr/lib/youcompleteme/third_party/ycmd'
-  enabledScopes:
+    order: 2
+  enabledFiletypes:
     type: 'string'
-    default: '.source.c, .source.cpp, .source.objc, .source.objcpp'
+    default: 'c, cpp, objc, objcpp'
+    order: 3
   globalExtraConfig:
     type: 'string'
     default: 'ycm_extra_conf.py'
-  lintDuringEdit:
-    type: 'boolean'
-    default: false
+    order: 4
