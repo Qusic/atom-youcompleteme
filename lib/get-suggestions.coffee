@@ -48,11 +48,6 @@ convertCompletions = ({completions, prefix, filetypes}) ->
       suggestion.type = completion.display_string.substr(0, (completion.display_string.indexOf ': '))
       return suggestion
 
-  formatter = (suggestion) ->
-    # if suggestion.leftLabel?.length > 20
-      # suggestion.leftLabel = "#{suggestion.leftLabel.substr 0, 20}…"
-    return suggestion
-
   converter = converters[(
     switch filetypes[0]
       when 'c', 'cpp', 'objc', 'objcpp' then 'clang'
@@ -60,7 +55,7 @@ convertCompletions = ({completions, prefix, filetypes}) ->
       else 'general'
   )]
 
-  completions.map (completion) -> formatter converter completion
+  completions.map converter
 
 getSuggestions = (context) ->
   Promise.resolve context
