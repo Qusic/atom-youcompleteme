@@ -1,20 +1,21 @@
 handler = require './handler'
-provider = require './provider'
 config = require './config'
 menu = require './menu'
-updateDependencies = require './update-dependencies'
 
+provider = null
 configObserver = null
 
 activate = ->
+  provider = require './provider'
   configObserver = atom.config.observe 'you-complete-me', handler.reset
   menu.register()
-  updateDependencies()
+  return
 
 deactivate = ->
   configObserver?.dispose()
   menu.deregister()
   handler.reset()
+  return
 
 module.exports =
   config: config

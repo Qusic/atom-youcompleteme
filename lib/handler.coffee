@@ -11,8 +11,6 @@ url = require 'url'
 utility = require './utility'
 debug = require './debug'
 
-ycmdPath = path.resolve atom.packages.resolvePackagePath('you-complete-me'), 'ycmd'
-ycmdPath = atom.config.get 'you-complete-me.legacyYcmdPath' if atom.config.get 'you-complete-me.legacyYcmdUse'
 ycmdProcess = null
 port = null
 hmacSecret = null
@@ -35,7 +33,7 @@ launch = ->
         reject error
 
   readDefaultOptions = new Promise (fulfill, reject) ->
-    defaultOptionsFile = path.resolve ycmdPath, 'ycmd', 'default_settings.json'
+    defaultOptionsFile = path.resolve atom.config.get('you-complete-me.ycmdPath'), 'ycmd', 'default_settings.json'
     fs.readFile defaultOptionsFile, encoding: 'utf8', (error, data) ->
       unless error?
         fulfill JSON.parse data
@@ -58,7 +56,7 @@ launch = ->
     parameters =
       command: atom.config.get 'you-complete-me.pythonExecutable'
       args: [
-        path.resolve ycmdPath, 'ycmd'
+        path.resolve atom.config.get('you-complete-me.ycmdPath'), 'ycmd'
         "--port=#{port}"
         "--options_file=#{optionsFile}"
         '--idle_suicide_seconds=600'

@@ -1,6 +1,6 @@
 os = require 'os'
 path = require 'path'
-{File} = require 'atom'
+{File, Point} = require 'atom'
 
 getEditorData = (editor = atom.workspace.getActiveTextEditor(), scopeDescriptor = editor.getRootScopeDescriptor()) ->
   filepath = editor.getPath()
@@ -20,7 +20,7 @@ getEditorData = (editor = atom.workspace.getActiveTextEditor(), scopeDescriptor 
 getEditorFiletype = (scopeDescriptor = atom.workspace.getActiveTextEditor().getRootScopeDescriptor()) ->
   return scopeDescriptor.getScopesArray()[0].split('.').pop()
 
-buildRequestParameters = (filepath, contents, filetypes = [], bufferPosition = [0, 0]) ->
+buildRequestParameters = (filepath, contents, filetypes = [], bufferPosition = new Point(0, 0)) ->
   parameters =
     filepath: filepath
     line_num: bufferPosition.row + 1

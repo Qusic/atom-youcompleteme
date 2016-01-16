@@ -2,11 +2,11 @@ handler = require './handler'
 utility = require './utility'
 
 processContext = (editor) ->
-  utility.getEditorData(editor).then ({filepath, contents}) ->
-    return {filepath, contents}
+  utility.getEditorData(editor).then ({filepath, contents, filetypes}) ->
+    return {filepath, contents, filetypes}
 
-fetchEvents = ({filepath, contents}) ->
-  parameters = utility.buildRequestParameters filepath, contents, ['cpp']
+fetchEvents = ({filepath, contents, filetypes}) ->
+  parameters = utility.buildRequestParameters filepath, contents, filetypes
   parameters.event_name = 'FileReadyToParse'
   handler.request('POST', 'event_notification', parameters).then (response) ->
     events = if Array.isArray response then response else []

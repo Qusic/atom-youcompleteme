@@ -2,13 +2,14 @@ getSuggestions = require './get-suggestions'
 getCompileEvents = require './get-compile-events'
 
 module.exports =
-  selector: '.source.c, .source.cpp, .source.objc, .source.objcpp, .source.python'
-  inclusionPriority: 1
+  selector: atom.config.get('you-complete-me.enabledScopes')
+  inclusionPriority: 2
+  suggestionPriority: 2
   excludeLowerPriority: false
 
-  grammarScopes: ['source.c', 'source.cpp', 'source.objc', 'source.objcpp']
-  scope: 'file' # or 'project'
-  lintOnFly: atom.config.get 'you-complete-me.lintDuringEdit' # must be false for scope: 'project'
+  grammarScopes: atom.config.get('you-complete-me.enabledScopes').split(',').map (scope) -> scope.trim().replace(/^\./, '')
+  scope: 'file'
+  lintOnFly: atom.config.get 'you-complete-me.lintDuringEdit'
 
   getSuggestions: (context) ->
     getSuggestions(context).catch (error) ->
