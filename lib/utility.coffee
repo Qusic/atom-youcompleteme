@@ -5,7 +5,7 @@ path = require 'path'
 getEditorData = (editor = atom.workspace.getActiveTextEditor(), scopeDescriptor = editor.getRootScopeDescriptor()) ->
   filepath = editor.getPath()
   contents = editor.getText()
-  filetypes = scopeDescriptor.getScopesArray().map (scope) -> scope.split('.').pop()
+  filetypes = getScopeFiletypes scopeDescriptor
   bufferPosition = editor.getCursorBufferPosition()
   if filepath?
     return Promise.resolve {filepath, contents, filetypes, bufferPosition}
@@ -17,8 +17,8 @@ getEditorData = (editor = atom.workspace.getActiveTextEditor(), scopeDescriptor 
         .then -> fulfill {filepath, contents, filetypes, bufferPosition}
         .catch (error) -> reject error
 
-getEditorFiletype = (scopeDescriptor = atom.workspace.getActiveTextEditor().getRootScopeDescriptor()) ->
-  return scopeDescriptor.getScopesArray()[0].split('.').pop()
+getScopeFiletypes = (scopeDescriptor = atom.workspace.getActiveTextEditor().getRootScopeDescriptor()) ->
+  return scopeDescriptor.getScopesArray().map (scope) -> scope.split('.').pop()
 
 buildRequestParameters = (filepath, contents, filetypes = [], bufferPosition = new Point(0, 0)) ->
   parameters =
@@ -26,12 +26,15 @@ buildRequestParameters = (filepath, contents, filetypes = [], bufferPosition = n
     line_num: bufferPosition.row + 1
     column_num: bufferPosition.column + 1
     file_data: {}
-  parameters.file_data[filepath] =
-    contents: contents
-    filetypes: filetypes
+  parameters.file_data[filepath] = {contents, filetypes}
+  atom.workspace.getTextEditors()
+    .filter (editor) -> editor.isModified() and editor.getPath()? and editor.getPath() isnt filepath
+    .forEach (editor) -> parameters.file_data[editor.getPath()] =
+      contents: editor.getText()
+      filetypes: getScopeFiletypes editor.getRootScopeDescriptor()
   return parameters
 
 module.exports =
   getEditorData: getEditorData
-  getEditorFiletype: getEditorFiletype
+  getScopeFiletypes: getScopeFiletypes
   buildRequestParameters: buildRequestParameters
