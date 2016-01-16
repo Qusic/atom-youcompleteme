@@ -4,26 +4,12 @@ utility = require './utility'
 editorsObserver = null
 configObserver = null
 
-processEditor = (editor) ->
-  utility.getEditorData(editor).then ({filepath, contents, filetypes}) ->
-    return {filepath, contents, filetypes}
-
-setEventData = (name, args = {}) -> (data) ->
-  data.name = name
-  data.args = args
-  return data
-
-sendEventRequest = ({name, args, filepath, contents, filetypes}) ->
-  parameters = utility.buildRequestParameters filepath, contents, filetypes
-  parameters.event_name = name
-  parameters[key] = value for key, value of args
-  handler.request('POST', 'event_notification', parameters)
-
 emitEvent = (editor, name, args) ->
-  Promise.resolve editor
-    .then processEditor
-    .then setEventData name, args
-    .then sendEventRequest
+  utility.getEditorData(editor).then ({filepath, contents, filetypes}) ->
+    parameters = utility.buildRequestParameters filepath, contents, filetypes
+    parameters.event_name = name
+    parameters[key] = value for key, value of args
+    handler.request('POST', 'event_notification', parameters)
 
 observeEditors = ->
   atom.workspace.observeTextEditors (editor) ->
