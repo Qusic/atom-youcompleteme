@@ -25,29 +25,8 @@
 
 ## Usage
 
-### 1. Install the package
-
-Open Atom and it will download ycmd automatically from Github. Depending on your Internet connection, it may take several minutes.
-
-### 2. Build C++ components of ycmd
-
-```
-cd ~/.atom/packages/you-complete-me/ycmd
-./build.py [--clang-completer] [--omnisharp-completer] [--gocode-completer]
-```
-
-Sometimes you have to rebuild them after upgrading the package. You will get notified in Atom if that happens.
-
-## Ycmd Version
-
-You may notice that this package uses a fork of ycmd instead of the original one. It is necessary for all the awesome features because the upstream does not merge pull requests quickly enough or some essential changes are specific to Atom client and will not be merged into the upstream.
-
-It is also possible to use this package with the original ycmd but some features may be limited. You can configure it in the settings.
-
-For detailed instructions and troubleshooting on building ycmd, see [YouCompleteMe's README](https://github.com/Valloric/YouCompleteMe/blob/master/README.md#installation).
-
-## FAQ
-
-### It always gives an error stating that ycmd needs to be recompiled.
-
-Check your Python Executable config and make sure you are using python2 instead of python3.
+* Install the package
+* Configure the path to your python executable and ycmd installation
+<br>Make sure you are using python2 instead of python3
+<br>For detailed instructions and troubleshooting on building ycmd, see [YouCompleteMe's README](https://github.com/Valloric/YouCompleteMe/blob/master/README.md#installation).
+* By default this package is enabled for C/C++/Objective-C/Objective-C++ only. You can enable it for other filetypes that YouCompleteMe supports.
