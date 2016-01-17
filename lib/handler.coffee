@@ -103,16 +103,13 @@ request = (method, endpoint, parameters = null) -> prepare().then ->
   verifyMessage = (message, payload) ->
     verifyHmac payload, message.headers['x-ycm-hmac'], 'base64'
 
-  unicodeEscaper = (key, value) ->
-    if typeof value is 'string'
-      escapedString = ''
-      for i in [0...value.length]
-        char = value.charAt i
-        charCode = value.charCodeAt i
-        escapedString += if charCode < 0x80 then char else ('\\u' + ('0000' + charCode.toString 16).substr -4)
-      return escapedString
-    else
-      return value
+  escapeUnicode = (string) ->
+    escapedString = ''
+    for i in [0...string.length]
+      char = string.charAt i
+      charCode = string.charCodeAt i
+      escapedString += if charCode < 0x80 then char else ('\\u' + ('0000' + charCode.toString 16).substr -4)
+    return escapedString
 
   handleException = (response) ->
     notifyException = ->
@@ -147,7 +144,7 @@ request = (method, endpoint, parameters = null) -> prepare().then ->
       isPost = method is 'POST'
       requestPayload = ''
       if isPost
-        requestPayload = JSON.stringify parameters, unicodeEscaper if parameters?
+        requestPayload = escapeUnicode JSON.stringify parameters if parameters?
         requestMessage.headers['Content-Type'] = 'application/json'
         requestMessage.headers['Content-Length'] = requestPayload.length
       else
