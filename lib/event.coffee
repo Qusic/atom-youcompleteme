@@ -1,8 +1,9 @@
+{CompositeDisposable} = require 'atom'
+
 handler = require './handler'
 utility = require './utility'
 
-editorsObserver = null
-configObserver = null
+disposables = null
 
 emitEvent = (editor, name, args) ->
   utility.getEditorData(editor).then ({filepath, contents, filetypes}) ->
@@ -21,39 +22,39 @@ observeEditors = ->
     onInsertLeave = -> emitEvent editor, 'InsertLeave'
     onCurrentIdentifierFinished = -> emitEvent editor, 'CurrentIdentifierFinished'
 
-    observers = []
-    observers.push editor.observeGrammar ->
+    observers = new CompositeDisposable()
+    observers.add editor.observeGrammar ->
       if isEnabled()
         onBufferVisit()
         enabled = true
       else
         onBufferUnload() if enabled
         enabled = false
-    observers.push editor.onDidChangePath ->
+    observers.add editor.onDidChangePath ->
       if enabled
         onBufferUnload()
         onBufferVisit()
       path = editor.getPath()
-    observers.push editor.onDidStopChanging ->
+    observers.add editor.onDidStopChanging ->
       if enabled
         onInsertLeave()
         onCurrentIdentifierFinished()
-    observers.push editor.onDidDestroy ->
+    observers.add editor.onDidDestroy ->
       if enabled
         onBufferUnload()
-      observer.dispose() for observer in observers
+      observers.dispose()
 
 observeConfig = ->
   atom.config.observe 'you-complete-me', (value) ->
     handler.reset()
 
 register = ->
-  editorsObserver = observeEditors()
-  configObserver = observeConfig()
+  disposables = new CompositeDisposable()
+  disposables.add observeEditors()
+  disposables.add observeConfig()
 
 deregister = ->
-  editorsObserver.dispose()
-  configObserver.dispose()
+  disposables.dispose()
 
 module.exports =
   register: register
