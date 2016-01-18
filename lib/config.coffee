@@ -13,5 +13,9 @@ module.exports =
     order: 3
   globalExtraConfig:
     type: 'string'
-    default: 'ycm_extra_conf.py'
+    default: ''
     order: 4
+  rustSrcPath:
+    type: 'string'
+    default: ''
+    order: 5
