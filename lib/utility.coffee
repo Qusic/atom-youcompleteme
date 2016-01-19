@@ -1,5 +1,5 @@
-getEditorData = (editor = atom.workspace.getActiveTextEditor(), scopeDescriptor = editor.getRootScopeDescriptor(), bufferPosition = editor.getCursorBufferPosition()) ->
-  curedit = atom.workspace.getTextEditors().filter (x) -> x isnt editor and getFileStatus(x.getPath(), 'visit') and x.isModified()
+getEditorData = (fileStatusDb, editor = atom.workspace.getActiveTextEditor(), scopeDescriptor = editor.getRootScopeDescriptor(), bufferPosition = editor.getCursorBufferPosition()) ->
+  curedit = atom.workspace.getTextEditors().filter (x) -> x isnt editor and fileStatusDb.getStatus(x.getPath(), 'visit') and x.isModified()
   curedit.unshift editor
   filedatas = curedit.map (x) ->
     filepath: x.getPath()

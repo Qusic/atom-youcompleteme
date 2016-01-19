@@ -38,7 +38,7 @@ module.exports =
   activate: p.activate
   deactivate: p.deactivate
 
-  provideSuggestions: -> autocompletePlusConfiguration(p.dispatcher)
+  provideSuggestions: -> autocompletePlusConfiguration(p.dispatcher, lexer)
   provideLinter: -> linterConfiguration(p.dispatcher, lexer)
 
   Package: Package

@@ -18,6 +18,7 @@ describe "utilities", ->
 describe "atom utilities", ->
 
   beforeEach ->
+    @fileStatusDb = new utility.FileStatusDB()
     singleEditorWith fileExtension='c', content="int x = 42;", (editor) => @editor = editor
 
   it "should get the editor filetype", ->
@@ -25,7 +26,7 @@ describe "atom utilities", ->
 
   it "should obtain editor data in the correct format", ->
     waitsForPromise ->
-      utility.getEditorData @editor
+      utility.getEditorData @fileStatusDb, @editor
         .then (value) ->
           expect(value.filedatas.length).toBe(1)
           finfo = value.filedatas[0]
@@ -36,7 +37,7 @@ describe "atom utilities", ->
 
   it "should be able to build request parameters from editor data", ->
     waitsForPromise ->
-      utility.getEditorData @editor
+      utility.getEditorData @fileStatusDb, @editor
         .then ({filedatas, bufferPosition}) ->
           p = utility.buildRequestParameters(filedatas, bufferPosition)
           expect(p.column_num).toBe 12

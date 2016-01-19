@@ -1,5 +1,5 @@
 {getSuggestions} = require '../lib/get-suggestions'
-{assurePluginLoadedWithLanguage, openWorkspaceWithEditor} = require './utility'
+{assurePluginLoadedWithLanguage, openWorkspaceWithEditor, dispatcherMock} = require './utility'
 
 describe "get-suggestions", ->
   assert = (_this) -> (assertionCallback) ->
@@ -17,6 +17,8 @@ describe "get-suggestions", ->
       editor: editor
       bufferPosition: end
       scopeDescriptor: cursor.getScopeDescriptor()
+      # TODO: remove this - it's added automatically
+      filedatas: [filepath: 'some/path', filetypes: ['rust']]
       prefix: prefix
     getSuggestions(request, dispatcher, lexer)
 
@@ -30,8 +32,8 @@ describe "get-suggestions", ->
 
   beforeEachFor 'rust', 'rs', withDefaultProvider = false
   beforeEach ->
-    # TODO: setup actual mocks
-    @dispatcher = jasmine.createSpyObj 'Dispatcher', ['foo']
+    # TODO: setup actual mocks, to call actual code. dispatcherMock is a complete mock
+    @dispatcher = dispatcherMock()
     @lexer = jasmine.createSpyObj 'lexer', ['bar']
     @assert = assert(this)
 

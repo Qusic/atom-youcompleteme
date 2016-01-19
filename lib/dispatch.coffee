@@ -2,8 +2,8 @@
 handler = require './handler'
 {CompositeDisposable} = require 'atom'
 
-processContext = ({editor, scopeDescriptor, bufferPosition}) ->
-  getEditorData(editor, scopeDescriptor, bufferPosition).then ({filedatas, bufferPosition}) ->
+processContext = (fileStatusDb, {editor, scopeDescriptor, bufferPosition}) ->
+  getEditorData(fileStatusDb, editor, scopeDescriptor, bufferPosition).then ({filedatas, bufferPosition}) ->
     return {editor, filedatas, bufferPosition}
 
 class Dispatcher
@@ -78,7 +78,7 @@ class Dispatcher
 
     (context) =>
       @fileStatusDb.setStatus context.editor.getPath(), 'pending', true
-      processContext context
+      processContext @fileStatusDb, context
         .then processVisit
         .then handleContext
 

@@ -1,7 +1,7 @@
 {getSuggestions} = require './get-suggestions'
 {getCompileEvents} = require './get-compile-events'
 
-autocompletePlusConfiguration = (dispatcher, suggestionsFor = getSuggestions) ->
+autocompletePlusConfiguration = (dispatcher, lexer, suggestionsFor = getSuggestions) ->
   name: 'YCM Autocomplete Provider'
   selector: (
     langs = ['.source.c', '.source.cpp', '.source.objc', '.source.objcpp']
@@ -29,8 +29,7 @@ autocompletePlusConfiguration = (dispatcher, suggestionsFor = getSuggestions) ->
   dispose: ->
     # nothing for now !
 
-linterConfiguration = (dispatcher, lexer,
-                      compileEventsFor = getCompileEvents) ->
+linterConfiguration = (dispatcher, compileEventsFor = getCompileEvents) ->
   name: 'YCM Linter'
   grammarScopes: (
     langs = ['source.c', 'source.cpp', 'source.objc', 'source.objcpp']

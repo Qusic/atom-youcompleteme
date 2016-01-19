@@ -1,14 +1,15 @@
 {autocompletePlusConfiguration} = require '../lib/provider'
+{dispatcherMock} = require './utility'
 
 describe "Provider", ->
   describe "autocompletePlusConfiguration()", ->
     pc = autocompletePlusConfiguration
     beforeEach ->
-      @suggestions = jasmine.createSpy('getSuggestions')
-      @lints = jasmine.createSpy('getCompileEvents')
-      @p = pc @suggestions, @lints
+      @dispatcher = dispatcherMock()
+      @lexer = jasmine.createSpy('lexer');
+      @p = pc @dispatcher, @lexer
 
-    it "configure a selector based on enabled languages", ->
+    it "configures a selector based on enabled languages", ->
       supportsRust = true
       spyOn(atom.config, 'get').andCallFake (key) ->
         return supportsRust if key == 'you-complete-me.rust'
@@ -19,8 +20,23 @@ describe "Provider", ->
       supportsRust = false
       expect(pc().selector).not.toContain 'rust'
 
-    it "should convert suggestion errors to an empty array", ->
-      # TODO
+    describe "error handling", ->
+      beforeEach ->
+        @context =
+          editor: jasmine.createSpyObj('editor', ['getPath'])
+
+        @context.editor.getPath.andReturn "some/path"
+        @dispatcher.processBefore.andCallFake -> -> throw new Error('cannot do that')
+        spyOn(console, 'error')
+
+      it "can handle errors by printing to console and returning []", ->
+        waitsForPromise =>
+          @p.getSuggestions @context
+            .then (value) ->
+              expect(value).toEqual []
+              expect(console.error.calls.length).toBe 1
+              expect(console.error.mostRecentCall.args[1].message).toEqual 'cannot do that'
+
 
   describe "linterConfiguration()", ->
     # TODO

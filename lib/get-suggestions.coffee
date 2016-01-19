@@ -13,7 +13,7 @@ fetchCompletions = (dispatcher, activatedManually) -> ({editor, filedatas, buffe
     prefix = editor.getTextInBufferRange [[bufferPosition.row, startColumn], bufferPosition]
     return {completions, prefix, filetypes: filedatas[0].filetypes}
 
-convertCompletions = (lexer, {completions, prefix, filetypes}) ->
+convertCompletions = (lexer) -> ({completions, prefix, filetypes}) ->
   converters =
     general: (completion) ->
       suggestion =
@@ -73,8 +73,8 @@ convertCompletions = (lexer, {completions, prefix, filetypes}) ->
 
 getSuggestions = (context, dispatcher, lexer = lexer) ->
   return Promise.resolve [] unless context.editor.getPath()?
-  return Promise.resolve [] if dispatcher.fileStatusDb.setFileStatus context.editor.getPath(), 'ready'
-  return Promise.resolve [] if dispatcher.fileStatusDb.getFileStatus context.editor.getPath(), 'closing'
+  return Promise.resolve [] if dispatcher.fileStatusDb.setStatus context.editor.getPath(), 'ready'
+  return Promise.resolve [] if dispatcher.fileStatusDb.getStatus context.editor.getPath(), 'closing'
 
   filepath = context.editor.getPath()
   Promise.resolve context

@@ -16,8 +16,10 @@ describe "Dispatcher", ->
   beforeEach ->
     singleEditorWith fileExtension='c', content="int x = 42;", (editor) => @editor = editor
 
+    @fileStatusDb = new FileStatusDB()
+
     waitsForPromise =>
-      getEditorData @editor
+      getEditorData @fileStatusDb, @editor
         .then (@context) =>
 
     runs =>
@@ -28,7 +30,7 @@ describe "Dispatcher", ->
       spyOn(compositeDisposable, 'dispose')
 
       @context.editor = @editor
-      @d = new Dispatcher(handler, new FileStatusDB(), compositeDisposable)
+      @d = new Dispatcher(handler, @fileStatusDb, compositeDisposable)
 
   describe "processReady()", ->
     status = (_this, status) -> _this.d.fileStatusDb.getStatus _this.context.editor.getPath(), status
@@ -46,7 +48,6 @@ describe "Dispatcher", ->
     ]
       ((enableError, expectRejection) ->
         it "should not mark it as firstready if " + errorDescription, ->
-          console.log expectRejection, errorDescription
           enableError @d.handler
           waitsForPromise shouldReject: expectRejection, =>
             @d.processReady @context
