@@ -54,7 +54,7 @@ launch = ->
         reject error
 
   startServer = (optionsFile) -> new Promise (fulfill, reject) ->
-    parameters =
+    ycmdProcess = new BufferedProcess
       command: atom.config.get 'you-complete-me.pythonExecutable'
       args: [
         path.resolve atom.config.get('you-complete-me.ycmdPath'), 'ycmd'
@@ -63,10 +63,9 @@ launch = ->
         '--idle_suicide_seconds=600'
       ]
       options: {}
+      stdout: (output) -> debug.log 'CONSOLE', output
+      stderr: (output) -> debug.log 'CONSOLE', output
       exit: (status) -> ycmdProcess = null
-    parameters.stdout = (output) -> debug.log 'CONSOLE', output
-    parameters.stderr = (output) -> debug.log 'CONSOLE', output
-    ycmdProcess = new BufferedProcess parameters
     setTimeout(fulfill, 1000)
 
   Promise.all [findUnusedPort, generateRandomSecret, readDefaultOptions]
