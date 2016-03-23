@@ -15,8 +15,9 @@ module.exports =
       [Ycmd](https://github.com/Valloric/ycmd) is required for this plugin to work.
     '
   enabledFiletypes:
-    type: 'string'
-    default: 'c, cpp, objc, objcpp'
+    type: 'array'
+    items: type: 'string'
+    default: ['c, cpp, objc, objcpp']
     order: 3
     description: '
       An array of filetypes within we should provide completions and diagnostics.

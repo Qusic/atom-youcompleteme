@@ -38,7 +38,7 @@ buildRequestParameters = (filepath, contents, filetypes = [], bufferPosition = n
   return parameters
 
 isEnabledForScope = (scopeDescriptor) ->
-  enabledFiletypes = atom.config.get('you-complete-me.enabledFiletypes').split(',').map (filetype) -> filetype.trim()
+  enabledFiletypes = atom.config.get 'you-complete-me.enabledFiletypes'
   filetypes = getScopeFiletypes scopeDescriptor
   filetype = filetypes.find (filetype) -> enabledFiletypes.indexOf(filetype) >= 0
   return if filetype? then true else false
