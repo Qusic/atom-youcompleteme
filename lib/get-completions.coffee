@@ -29,7 +29,7 @@ convertCompletions = ({completions, prefix, filetypes}) ->
         displayText: completion.menu_text
         leftLabel: completion.extra_menu_info
         rightLabel: completion.kind
-        description: null
+        description: completion.detailed_info
       suggestion.type = switch completion.kind
         when '[File]', '[Dir]', '[File&Dir]' then 'import'
         else null
