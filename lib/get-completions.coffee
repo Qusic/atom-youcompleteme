@@ -1,13 +1,19 @@
 handler = require './handler'
 utility = require './utility'
 
+forceSemantic = false
+lastPrefix = ''
+
 processContext = ({editor, scopeDescriptor, bufferPosition, prefix, activatedManually}) ->
   utility.getEditorData(editor, scopeDescriptor).then ({filepath, contents, filetypes}) ->
-    return {editor, filepath, contents, filetypes, bufferPosition, activatedManually}
+    return {editor, filepath, contents, filetypes, bufferPosition, prefix, activatedManually}
 
-fetchCompletions = ({editor, filepath, contents, filetypes, bufferPosition, activatedManually}) ->
+fetchCompletions = ({editor, filepath, contents, filetypes, bufferPosition, prefix, activatedManually}) ->
+  forceSemantic = false unless prefix.startsWith(lastPrefix) or lastPrefix.startsWith(prefix)
+  forceSemantic = true if activatedManually
+  lastPrefix = prefix
   parameters = utility.buildRequestParameters filepath, contents, filetypes, bufferPosition
-  parameters.force_semantic = true if activatedManually
+  parameters.force_semantic = forceSemantic
   handler.request('POST', 'completions', parameters).then (response) ->
     completions = response?.completions or []
     startColumn = (response?.completion_start_column or (bufferPosition.column + 1)) - 1
