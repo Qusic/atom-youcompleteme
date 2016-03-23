@@ -31,10 +31,29 @@ module.exports =
       The fallback extra config file when no `.ycm_extra_conf.py` is found.
       Follow [this link](https://github.com/Valloric/YouCompleteMe#the-gycm_global_ycm_extra_conf-option) for more information.
     '
+  confirmExtraConfig:
+    type: 'boolean'
+    default: true
+    order: 5
+    description: '
+      Whether to ask once before loading an extra config file for safety reason.
+      To selectively whitelist or blacklist them, use **Extra Config Globlist** option.
+      Follow [this link](https://github.com/Valloric/YouCompleteMe#the-gycm_confirm_extra_conf-option) for more information.
+    '
+  extraConfigGloblist:
+    type: 'array'
+    items: type: 'string'
+    default: []
+    order: 6
+    description: '
+      Extra config files whitelist and blacklist,
+      e.g. `~/dev/*, !~/*` would make it load all `.ycm_extra_conf.py` under `~/dev/` and not to load all other `.ycm_extra_conf.py` under `~/`, without confirmation.
+      Follow [this link](https://github.com/Valloric/YouCompleteMe#the-gycm_extra_conf_globlist-option) for more information.
+    '
   rustSrcPath:
     type: 'string'
     default: ''
-    order: 5
+    order: 7
     description: '
       The directory containing the [Rust source code](https://github.com/rust-lang/rust).
       You have also to to add `rust` in **Enabled Filetypes**.

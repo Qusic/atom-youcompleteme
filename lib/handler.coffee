@@ -44,8 +44,12 @@ launch = ->
     port = unusedPort
     hmacSecret = randomSecret
     options.hmac_secret = hmacSecret.toString 'base64'
-    options.global_ycm_extra_conf = atom.config.get 'you-complete-me.globalExtraConfig'
-    options.rust_src_path = atom.config.get 'you-complete-me.rustSrcPath'
+    options[theirKey] = atom.config.get "you-complete-me.#{ourKey}" for theirKey, ourKey of {
+      'global_ycm_extra_conf': 'globalExtraConfig'
+      'confirm_extra_conf': 'confirmExtraConfig'
+      'extra_conf_globlist': 'extraConfigGloblist'
+      'rust_src_path': 'rustSrcPath'
+    }
     optionsFile = path.resolve os.tmpdir(), "AtomYcmOptions-#{Date.now()}"
     fs.writeFile optionsFile, JSON.stringify(options), encoding: 'utf8', (error) ->
       unless error?
