@@ -17,7 +17,7 @@ module.exports =
   enabledFiletypes:
     type: 'array'
     items: type: 'string'
-    default: ['c, cpp, objc, objcpp']
+    default: ['c', 'cpp', 'objc', 'objcpp']
     order: 3
     description: '
       An array of filetypes within we should provide completions and diagnostics.
