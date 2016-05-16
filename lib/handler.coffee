@@ -116,7 +116,7 @@ request = (method, endpoint, parameters = null) -> prepare().then ->
 
   handleException = (response) ->
     notifyException = ->
-      atom.notifications.addError "[YCM] #{response.exception.TYPE} #{response.message}", detail: if atom.inDevMode() then "#{response.traceback}" else null
+      atom.notifications.addWarning "[YCM] #{response.exception.TYPE}", detail: "#{response.message}\n#{response.traceback}"
 
     confirmExtraConfig = ->
       filepath = response.exception.extra_conf_file
@@ -134,7 +134,7 @@ request = (method, endpoint, parameters = null) -> prepare().then ->
     if response?.exception?
       switch response.exception.TYPE
         when 'UnknownExtraConf' then confirmExtraConfig()
-        else notifyException() unless shouldIgnore
+        else notifyException() unless shouldIgnore()
 
   Promise.resolve()
     .then ->
@@ -163,8 +163,8 @@ request = (method, endpoint, parameters = null) -> prepare().then ->
         responseMessage.on 'end', ->
           if verifyMessage responseMessage, responsePayload
             responseObject = try JSON.parse responsePayload catch error then responsePayload
-            debug.log 'REQUEST', method, endpoint, parameters
-            debug.log 'RESPONSE', responseObject
+            utility.debugLog 'REQUEST', method, endpoint, parameters
+            utility.debugLog 'RESPONSE', responseObject
             handleException responseObject
             fulfill responseObject
           else
@@ -192,9 +192,6 @@ request = (method, endpoint, parameters = null) -> prepare().then ->
 # POST /ignore_extra_conf_file
 #
 # POST /debug_info
-#
-# Only available on Qusic's ycmd fork:
-# POST /atom_completions
 
 module.exports =
   prepare: prepare
