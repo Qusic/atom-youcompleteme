@@ -27,6 +27,5 @@
 
 * Install the package
 * Configure the path to your python executable and ycmd installation
-<br>Make sure you are using python2 instead of python3
 <br>For detailed instructions and troubleshooting on building ycmd, see [ycmd's README](https://github.com/Valloric/ycmd#building).
 * By default this package is enabled for C/C++/Objective-C/Objective-C++ only. You can enable it for other filetypes that YouCompleteMe supports.
