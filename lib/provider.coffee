@@ -2,9 +2,6 @@ utility = require './utility'
 getCompletions = require './get-completions'
 getIssues = require './get-issues'
 
-enabledForScope = (scopeDescriptor) ->
-
-
 module.exports =
   selector: '*'
   inclusionPriority: 2

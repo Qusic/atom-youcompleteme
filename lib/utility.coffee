@@ -46,9 +46,13 @@ isEnabledForScope = (scopeDescriptor) ->
   filetype = filetypes.find (filetype) -> enabledFiletypes.indexOf(filetype) >= 0
   return if filetype? then true else false
 
+debugLog = (category, message...) ->
+  console.debug "[YCM-#{category}]", message... if atom.inDevMode()
+
 module.exports =
   getEditorTmpFilepath: getEditorTmpFilepath
   getEditorData: getEditorData
   getScopeFiletypes: getScopeFiletypes
   buildRequestParameters: buildRequestParameters
   isEnabledForScope: isEnabledForScope
+  debugLog: debugLog

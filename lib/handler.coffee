@@ -9,7 +9,6 @@ url = require 'url'
 {BufferedProcess} = require 'atom'
 
 utility = require './utility'
-debug = require './debug'
 
 ycmdProcess = null
 port = null
@@ -67,10 +66,10 @@ launch = ->
         '--idle_suicide_seconds=600'
       ]
       options: {}
-      stdout: (output) -> debug.log 'CONSOLE', output
-      stderr: (output) -> debug.log 'CONSOLE', output
       exit: (status) -> ycmdProcess = null
     setTimeout(fulfill, 1000)
+      stdout: (output) -> utility.debugLog 'CONSOLE', output
+      stderr: (output) -> utility.debugLog 'CONSOLE', output
 
   Promise.all [findUnusedPort, generateRandomSecret, readDefaultOptions]
     .then processData
