@@ -14,12 +14,8 @@ module.exports =
 
   getSuggestions: (context) ->
     return [] unless utility.isEnabledForScope context.scopeDescriptor
-    getCompletions(context).catch (error) ->
-      console.error '[YCM-ERROR]', error
-      return []
+    getCompletions(context).catch utility.notifyError []
 
   lint: (editor) ->
     return [] unless utility.isEnabledForScope editor.getRootScopeDescriptor()
-    getIssues(editor).catch (error) ->
-      console.error '[YCM-ERROR]', error
-      return []
+    getIssues(editor).catch utility.notifyError []

@@ -10,7 +10,7 @@ emitEvent = (editor, name, args) ->
     parameters = utility.buildRequestParameters filepath, contents, filetypes
     parameters.event_name = name
     parameters[key] = value for key, value of args
-    handler.request('POST', 'event_notification', parameters)
+    handler.request('POST', 'event_notification', parameters).catch utility.notifyError()
 
 observeEditors = ->
   atom.workspace.observeTextEditors (editor) ->

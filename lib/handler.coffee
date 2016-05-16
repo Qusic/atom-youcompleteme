@@ -125,8 +125,8 @@ request = (method, endpoint, parameters = null) -> prepare().then ->
         message: '[YCM] Unknown Extra Config'
         detailedMessage: message
         buttons:
-          Load: -> request 'POST', 'load_extra_conf_file', {filepath}
-          Ignore: -> request 'POST', 'ignore_extra_conf_file', {filepath}
+          Load: -> request('POST', 'load_extra_conf_file', {filepath}).catch utility.notifyError()
+          Ignore: -> request('POST', 'ignore_extra_conf_file', {filepath}).catch utility.notifyError()
 
     shouldIgnore = ->
       response.message is 'File already being parsed.'

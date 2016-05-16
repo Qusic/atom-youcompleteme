@@ -29,8 +29,9 @@ runCommand = (command) ->
 register = ->
   generatedCommands = {}
   generatedMenus = []
-  for key, command of commands
-    generatedCommands["you-complete-me:#{key}"] = ((command) -> (event) -> runCommand command)(command)
+  Object.keys(commands).forEach (key) ->
+    command = commands[key]
+    generatedCommands["you-complete-me:#{key}"] = (event) -> runCommand(command).catch utility.notifyError()
     generatedMenus.push command: "you-complete-me:#{key}", label: command
   atom.commands.add 'atom-text-editor', generatedCommands
   contextMenu = atom.contextMenu.add 'atom-text-editor': [label: 'YouCompleteMe', submenu: generatedMenus]
