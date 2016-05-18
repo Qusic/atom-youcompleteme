@@ -7,13 +7,11 @@ menu = require './menu'
 activate = ->
   event.register()
   menu.register()
-  return
 
 deactivate = ->
   event.deregister()
   menu.deregister()
   handler.reset()
-  return
 
 module.exports =
   config: config

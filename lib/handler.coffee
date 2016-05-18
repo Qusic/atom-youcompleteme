@@ -14,7 +14,7 @@ ycmdProcess = null
 port = null
 hmacSecret = null
 
-launch = ->
+launch = (exit) ->
   findUnusedPort = new Promise (fulfill, reject) ->
     net.createServer()
       .listen 0, ->
@@ -57,7 +57,7 @@ launch = ->
         reject error
 
   startServer = (optionsFile) -> new Promise (fulfill, reject) ->
-    ycmdProcess = new BufferedProcess
+    process = new BufferedProcess
       command: atom.config.get 'you-complete-me.pythonExecutable'
       args: [
         path.resolve atom.config.get('you-complete-me.ycmdPath'), 'ycmd'
@@ -69,31 +69,30 @@ launch = ->
       stdout: (output) -> utility.debugLog 'CONSOLE', output
       stderr: (output) -> utility.debugLog 'CONSOLE', output
       exit: (code) ->
-        ycmdProcess = null
+        exit()
         switch code
           when 3 then reject new Error 'Unexpected error while loading the YCM core library.'
           when 4 then reject new Error 'YCM core library not detected; you need to compile YCM before using it. Follow the instructions in the documentation.'
           when 5 then reject new Error 'YCM core library compiled for Python 3 but loaded in Python 2. Set the Python Executable config to a Python 3 interpreter path.'
           when 6 then reject new Error 'YCM core library compiled for Python 2 but loaded in Python 3. Set the Python Executable config to a Python 2 interpreter path.'
           when 7 then reject new Error 'YCM core library too old; PLEASE RECOMPILE by running the install.py script. See the documentation for more details.'
-    setTimeout fulfill, 1000
+    setTimeout (-> fulfill process), 1000
 
   Promise.all [findUnusedPort, generateRandomSecret, readDefaultOptions]
     .then processData
     .then startServer
 
 prepare = ->
-  if ycmdProcess?.killed is false
-    Promise.resolve()
-  else
-    launch()
+  ycmdProcess ?= launch -> ycmdProcess = null
 
 reset = ->
-  ycmdProcess?.kill()
-  ycmdProcess = null
-  port = null
-  hmacSecret = null
-  Promise.resolve()
+  realReset = (process) ->
+    process?.kill?()
+    ycmdProcess = null
+    port = null
+    hmacSecret = null
+  Promise.resolve ycmdProcess
+    .then realReset, realReset
 
 request = (method, endpoint, parameters = null) -> prepare().then ->
   generateHmac = (data, encoding) ->
