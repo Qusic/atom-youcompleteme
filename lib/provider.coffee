@@ -18,4 +18,5 @@ module.exports =
 
   lint: (editor) ->
     return [] unless utility.isEnabledForScope editor.getRootScopeDescriptor()
+    return [] unless atom.config.get 'you-complete-me.linterEnabled'
     getIssues(editor).catch utility.notifyError []
