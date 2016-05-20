@@ -11,6 +11,8 @@ url = require 'url'
 utility = require './utility'
 
 ycmdProcess = null
+ycmdProcessPending = false
+ycmdProcessPendingPromises = []
 port = null
 hmacSecret = null
 
@@ -57,7 +59,7 @@ launch = (exit) ->
         reject error
 
   startServer = (optionsFile) -> new Promise (fulfill, reject) ->
-    process = new BufferedProcess
+    ycmdProcess = new BufferedProcess
       command: atom.config.get 'you-complete-me.pythonExecutable'
       args: [
         path.resolve atom.config.get('you-complete-me.ycmdPath'), 'ycmd'
@@ -76,23 +78,36 @@ launch = (exit) ->
           when 5 then reject new Error 'YCM core library compiled for Python 3 but loaded in Python 2. Set the Python Executable config to a Python 3 interpreter path.'
           when 6 then reject new Error 'YCM core library compiled for Python 2 but loaded in Python 3. Set the Python Executable config to a Python 2 interpreter path.'
           when 7 then reject new Error 'YCM core library too old; PLEASE RECOMPILE by running the install.py script. See the documentation for more details.'
-    setTimeout (-> fulfill process), 1000
+
+    setTimeout (->
+      ycmdProcessPending = false
+      pendingPromise.resolve() for pendingPromise in ycmdProcessPendingPromises
+      ycmdProcessPendingPromises = []
+      fulfill()), 1000
 
   Promise.all [findUnusedPort, generateRandomSecret, readDefaultOptions]
     .then processData
     .then startServer
 
 prepare = ->
-  ycmdProcess ?= launch -> ycmdProcess = null
+  if ycmdProcess is null and not ycmdProcessPending
+    ycmdProcessPending = true
+    launch reset
+  else if ycmdProcessPending
+    pendingPromise = Promise.defer()
+    ycmdProcessPendingPromises.push pendingPromise
+    pendingPromise.promise
+  else
+    Promise.resolve()
 
 reset = ->
-  realReset = (process) ->
-    process?.kill?()
-    ycmdProcess = null
-    port = null
-    hmacSecret = null
-  Promise.resolve ycmdProcess
-    .then realReset, realReset
+  ycmdProcessPending = false
+  pendingPromise.reject new Error 'YCM reset.' for pendingPromise in ycmdProcessPendingPromises
+  ycmdProcessPendingPromises = []
+  ycmdProcess?.kill()
+  ycmdProcess = null
+  port = null
+  hmacSecret = null
 
 request = (method, endpoint, parameters = null) -> prepare().then ->
   generateHmac = (data, encoding) ->
