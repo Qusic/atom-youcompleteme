@@ -1,6 +1,7 @@
 utility = require './utility'
 getCompletions = require './get-completions'
 getIssues = require './get-issues'
+menu = require './menu'
 
 module.exports =
   selector: '*'
@@ -20,3 +21,9 @@ module.exports =
     return [] unless utility.isEnabledForScope editor.getRootScopeDescriptor()
     return [] unless atom.config.get 'you-complete-me.linterEnabled'
     getIssues(editor).catch utility.notifyError []
+
+  getSuggestionForWord: (editor, text, range) ->
+    if utility.isEnabledForScope editor.getRootScopeDescriptor()
+      callback = ->
+        menu.runCommand 'GoToImprecise'
+      return {range, callback}
