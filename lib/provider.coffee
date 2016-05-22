@@ -23,7 +23,6 @@ module.exports =
     getIssues(editor).catch utility.notifyError []
 
   getSuggestionForWord: (editor, text, range) ->
-    if utility.isEnabledForScope editor.getRootScopeDescriptor()
-      callback = ->
-        menu.runCommand 'GoToImprecise'
-      return {range, callback}
+    return null unless utility.isEnabledForScope editor.getRootScopeDescriptor()
+    callback = -> menu.runCommand 'GoToImprecise'
+    {range, callback}
