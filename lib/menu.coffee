@@ -42,3 +42,4 @@ deregister = ->
 module.exports =
   register: register
   deregister: deregister
+  runCommand: runCommand

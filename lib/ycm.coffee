@@ -19,3 +19,4 @@ module.exports =
   deactivate: deactivate
   provide: -> provider
   provideLinter: -> provider
+  provideHyperclick: -> provider
