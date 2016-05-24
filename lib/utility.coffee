@@ -34,7 +34,7 @@ buildRequestParameters = (filepath, contents, filetypes = [], bufferPosition = n
     file_data: {}
   parameters.file_data[filepath] = {contents, filetypes: filetypes.map(filetypeMapper)}
   atom.workspace.getTextEditors()
-    .filter (editor) -> editor.isModified() and editor.getPath()? and editor.getPath() isnt filepath
+    .filter (editor) -> editor.isModified() and editor.getPath()? and editor.getPath() isnt filepath and isEnabledForScope editor.getRootScopeDescriptor()
     .forEach (editor) -> parameters.file_data[editor.getPath()] =
       contents: editor.getText()
       filetypes: getScopeFiletypes(editor.getRootScopeDescriptor()).map(filetypeMapper)

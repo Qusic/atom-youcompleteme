@@ -14,33 +14,36 @@ emitEvent = (editor, name, args) ->
 
 observeEditors = ->
   atom.workspace.observeTextEditors (editor) ->
-    path = editor.getPath() or utility.getEditorTmpFilepath editor
-    enabled = false
+    path = null
     isEnabled = -> utility.isEnabledForScope editor.getRootScopeDescriptor()
-    onBufferVisit = -> emitEvent editor, 'BufferVisit'
-    onBufferUnload = -> emitEvent editor, 'BufferUnload', unloaded_buffer: path
-    onInsertLeave = -> emitEvent editor, 'InsertLeave'
+    onBufferVisit = ->
+      path = editor.getPath() or utility.getEditorTmpFilepath editor
+      emitEvent editor, 'BufferVisit'
+    onBufferUnload = ->
+      emitEvent editor, 'BufferUnload', unloaded_buffer: path
+      path = null
+    onFileReadyToParse = -> emitEvent editor, 'FileReadyToParse'
     onCurrentIdentifierFinished = -> emitEvent editor, 'CurrentIdentifierFinished'
 
     observers = new CompositeDisposable()
     observers.add editor.observeGrammar ->
       if isEnabled()
         onBufferVisit()
-        enabled = true
-      else
-        onBufferUnload() if enabled
-        enabled = false
-    observers.add editor.onDidChangePath ->
-      if enabled
+        onFileReadyToParse()
+      else if path?
         onBufferUnload()
+    observers.add editor.onDidChangePath ->
+      if path?
+        onBufferUnload()
+      if isEnabled()
         onBufferVisit()
-      path = editor.getPath()
+        onFileReadyToParse()
     observers.add editor.onDidStopChanging ->
-      if enabled
-        onInsertLeave()
+      if path?
         onCurrentIdentifierFinished()
+        onFileReadyToParse()
     observers.add editor.onDidDestroy ->
-      if enabled
+      if path?
         onBufferUnload()
       observers.dispose()
 
