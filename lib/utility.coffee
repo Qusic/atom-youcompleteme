@@ -2,6 +2,11 @@ os = require 'os'
 path = require 'path'
 {File, Point} = require 'atom'
 
+getWorkingDirectory = ->
+  projects = atom.project.getPaths()
+  activeFile = atom.workspace.getActiveTextEditor().getPath()
+  projects.find((project) -> activeFile.startsWith project) or projects[0] or atom.config.get 'core.projectHome'
+
 getEditorTmpFilepath = (editor) ->
   return path.resolve os.tmpdir(), "AtomYcmBuffer-#{editor.getBuffer().getId()}"
 
@@ -29,7 +34,7 @@ buildRequestParameters = (filepath, contents, filetypes = [], bufferPosition = n
       when 'js', 'jsx' then 'javascript'
       else filetype
     ).filter (filetype, index, filetypes) -> filetypes.indexOf(filetype) is index
-  workingDir = atom.project.getPaths().find((directory) -> filepath.startsWith directory) or path.dirname filepath
+  workingDir = getWorkingDirectory()
   parameters =
     filepath: filepath
     working_dir: workingDir
@@ -62,6 +67,7 @@ debugLog = (category, message...) ->
   console.debug "[YCM-#{category}]", message... if atom.inDevMode()
 
 module.exports =
+  getWorkingDirectory: getWorkingDirectory
   getEditorTmpFilepath: getEditorTmpFilepath
   getEditorData: getEditorData
   getScopeFiletypes: getScopeFiletypes

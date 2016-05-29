@@ -10,6 +10,7 @@ url = require 'url'
 
 utility = require './utility'
 
+workingDirectory = null
 ycmdProcess = null
 port = null
 hmacSecret = null
@@ -57,6 +58,7 @@ launch = (exit) ->
         reject error
 
   startServer = (optionsFile) -> new Promise (fulfill, reject) ->
+    workingDirectory = utility.getWorkingDirectory()
     process = new BufferedProcess
       command: atom.config.get 'you-complete-me.pythonExecutable'
       args: [
@@ -65,7 +67,7 @@ launch = (exit) ->
         "--options_file=#{optionsFile}"
         '--idle_suicide_seconds=600'
       ]
-      options: {}
+      options: cwd: workingDirectory
       stdout: (output) -> utility.debugLog 'CONSOLE', output
       stderr: (output) -> utility.debugLog 'CONSOLE', output
       exit: (code) ->
@@ -83,7 +85,9 @@ launch = (exit) ->
     .then startServer
 
 prepare = ->
-  ycmdProcess ?= launch -> ycmdProcess = null
+  Promise.resolve()
+    .then -> reset() if workingDirectory isnt utility.getWorkingDirectory()
+    .then -> ycmdProcess ?= launch -> ycmdProcess = null
 
 reset = ->
   realReset = (process) ->
