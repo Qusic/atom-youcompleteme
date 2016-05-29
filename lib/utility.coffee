@@ -24,9 +24,11 @@ getScopeFiletypes = (scopeDescriptor = atom.workspace.getActiveTextEditor().getR
   return scopeDescriptor.getScopesArray().map (scope) -> scope.split('.').pop()
 
 buildRequestParameters = (filepath, contents, filetypes = [], bufferPosition = new Point(0, 0)) ->
-  filetypeMapper = (filetype) -> switch filetype
-    when 'js' then 'javascript'
-    else filetype
+  convertFiletypes = (filetypes) ->
+    filetypes.map((filetype) -> switch filetype
+      when 'js', 'jsx' then 'javascript'
+      else filetype
+    ).filter (filetype, index, filetypes) -> filetypes.indexOf(filetype) is index
   workingDir = atom.project.getPaths().find((directory) -> filepath.startsWith directory) or path.dirname filepath
   parameters =
     filepath: filepath
@@ -34,12 +36,16 @@ buildRequestParameters = (filepath, contents, filetypes = [], bufferPosition = n
     line_num: bufferPosition.row + 1
     column_num: bufferPosition.column + 1
     file_data: {}
-  parameters.file_data[filepath] = {contents, filetypes: filetypes.map(filetypeMapper)}
+  parameters.file_data[filepath] = {contents, filetypes: convertFiletypes filetypes}
   atom.workspace.getTextEditors()
-    .filter (editor) -> editor.isModified() and editor.getPath()? and editor.getPath() isnt filepath
-    .forEach (editor) -> parameters.file_data[editor.getPath()] =
-      contents: editor.getText()
-      filetypes: getScopeFiletypes(editor.getRootScopeDescriptor()).map(filetypeMapper)
+    .filter (editor) ->
+      return false unless editor.isModified()
+      otherFilepath = editor.getPath()
+      otherFilepath? and otherFilepath isnt filepath and otherFilepath.startsWith workingDir
+    .forEach (editor) ->
+      parameters.file_data[editor.getPath()] =
+        contents: editor.getText()
+        filetypes: convertFiletypes getScopeFiletypes editor.getRootScopeDescriptor()
   return parameters
 
 isEnabledForScope = (scopeDescriptor) ->
