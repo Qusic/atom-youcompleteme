@@ -21,11 +21,13 @@ observeEditors = ->
     onBufferUnload = -> emitEvent editor, 'BufferUnload', unloaded_buffer: path
     onInsertLeave = -> emitEvent editor, 'InsertLeave'
     onCurrentIdentifierFinished = -> emitEvent editor, 'CurrentIdentifierFinished'
+    onFileReadyToParse = -> emitEvent editor, 'FileReadyToParse' unless atom.config.get 'you-complete-me.linterEnabled'
 
     observers = new CompositeDisposable()
     observers.add editor.observeGrammar ->
       if isEnabled()
         onBufferVisit()
+        onFileReadyToParse()
         enabled = true
       else
         onBufferUnload() if enabled
@@ -34,11 +36,13 @@ observeEditors = ->
       if enabled
         onBufferUnload()
         onBufferVisit()
+        onFileReadyToParse()
       path = editor.getPath()
     observers.add editor.onDidStopChanging ->
       if enabled
         onInsertLeave()
         onCurrentIdentifierFinished()
+        onFileReadyToParse()
     observers.add editor.onDidDestroy ->
       if enabled
         onBufferUnload()
