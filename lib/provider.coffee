@@ -24,5 +24,5 @@ module.exports =
 
   getSuggestionForWord: (editor, text, range) ->
     return null unless utility.isEnabledForScope editor.getRootScopeDescriptor()
-    callback = -> command.run 'GoTo'
+    callback = -> command.run 'GoTo', range.start
     {range, callback}

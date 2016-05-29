@@ -12,11 +12,11 @@ commands =
   'clear-compilation-flag-cache': 'ClearCompilationFlagCache'
 contextMenu = null
 
-run = (command) ->
+run = (command, position) ->
   Promise.resolve()
     .then utility.getEditorData
     .then ({filepath, contents, filetypes, bufferPosition}) ->
-      parameters = utility.buildRequestParameters filepath, contents, filetypes, bufferPosition
+      parameters = utility.buildRequestParameters filepath, contents, filetypes, position or bufferPosition
       parameters.command_arguments = [command]
       handler.request('POST', 'run_completer_command', parameters).then (response) ->
         if command.startsWith 'Get'
