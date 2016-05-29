@@ -14,7 +14,7 @@ module.exports =
   lintOnFly: true
 
   getSuggestions: (context) ->
-    return [] unless utility.isEnabledForScope context.scopeDescriptor
+    return [] unless utility.isEnabledForScope context.editor.getRootScopeDescriptor()
     getCompletions(context).catch utility.notifyError []
 
   lint: (editor) ->

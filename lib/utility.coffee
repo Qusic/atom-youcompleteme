@@ -5,10 +5,10 @@ path = require 'path'
 getEditorTmpFilepath = (editor) ->
   return path.resolve os.tmpdir(), "AtomYcmBuffer-#{editor.getBuffer().getId()}"
 
-getEditorData = (editor = atom.workspace.getActiveTextEditor(), scopeDescriptor = editor.getRootScopeDescriptor()) ->
+getEditorData = (editor = atom.workspace.getActiveTextEditor()) ->
   filepath = editor.getPath()
   contents = editor.getText()
-  filetypes = getScopeFiletypes scopeDescriptor
+  filetypes = getScopeFiletypes editor.getRootScopeDescriptor()
   bufferPosition = editor.getCursorBufferPosition()
   if filepath?
     return Promise.resolve {filepath, contents, filetypes, bufferPosition}

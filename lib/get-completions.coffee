@@ -4,8 +4,8 @@ utility = require './utility'
 forceSemantic = false
 lastPrefix = ''
 
-processContext = ({editor, scopeDescriptor, bufferPosition, prefix, activatedManually}) ->
-  utility.getEditorData(editor, scopeDescriptor).then ({filepath, contents, filetypes}) ->
+processContext = ({editor, bufferPosition, prefix, activatedManually}) ->
+  utility.getEditorData(editor).then ({filepath, contents, filetypes}) ->
     return {editor, filepath, contents, filetypes, bufferPosition, prefix, activatedManually}
 
 fetchCompletions = ({editor, filepath, contents, filetypes, bufferPosition, prefix, activatedManually}) ->
