@@ -179,26 +179,6 @@ request = (method, endpoint, parameters = null) -> prepare().then ->
       requestHandler.write requestPayload if isPost
       requestHandler.end()
 
-# API Endpoints:
-#
-# GET /ready
-# GET /healthy
-#
-# POST /semantic_completion_available
-# POST /completions
-# POST /detailed_diagnostic
-# POST /event_notification
-#
-# POST /defined_subcommands
-# POST /run_completer_command
-#
-# GET /user_options
-# POST /user_options
-# POST /load_extra_conf_file
-# POST /ignore_extra_conf_file
-#
-# POST /debug_info
-
 module.exports =
   prepare: prepare
   reset: reset
