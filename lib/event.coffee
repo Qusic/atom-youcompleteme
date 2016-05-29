@@ -60,6 +60,7 @@ register = ->
 deregister = ->
   disposables.dispose()
 
-module.exports =
-  register: register
-  deregister: deregister
+module.exports = {
+  register
+  deregister
+}

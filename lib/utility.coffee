@@ -69,12 +69,13 @@ notifyError = (result) -> (error) ->
 debugLog = (category, message...) ->
   console.debug "[YCM-#{category}]", message... if atom.inDevMode()
 
-module.exports =
-  getWorkingDirectory: getWorkingDirectory
-  getEditorTmpFilepath: getEditorTmpFilepath
-  getEditorData: getEditorData
-  getScopeFiletypes: getScopeFiletypes
-  buildRequestParameters: buildRequestParameters
-  isEnabledForScope: isEnabledForScope
-  notifyError: notifyError
-  debugLog: debugLog
+module.exports = {
+  getWorkingDirectory
+  getEditorTmpFilepath
+  getEditorData
+  getScopeFiletypes
+  buildRequestParameters
+  isEnabledForScope
+  notifyError
+  debugLog
+}

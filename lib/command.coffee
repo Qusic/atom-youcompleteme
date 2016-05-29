@@ -39,7 +39,8 @@ register = ->
 deregister = ->
   contextMenu.dispose()
 
-module.exports =
-  register: register
-  deregister: deregister
-  run: run
+module.exports = {
+  register
+  deregister
+  run
+}

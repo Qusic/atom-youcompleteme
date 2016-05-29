@@ -13,10 +13,11 @@ deactivate = ->
   command.deregister()
   handler.reset()
 
-module.exports =
-  config: config
-  activate: activate
-  deactivate: deactivate
+module.exports = {
+  config
+  activate
+  deactivate
   provide: -> provider
   provideLinter: -> provider
   provideHyperclick: -> provider
+}

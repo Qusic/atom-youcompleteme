@@ -183,7 +183,8 @@ request = (method, endpoint, parameters = null) -> prepare().then ->
       requestHandler.write requestPayload if isPost
       requestHandler.end()
 
-module.exports =
-  prepare: prepare
-  reset: reset
-  request: request
+module.exports = {
+  prepare
+  reset
+  request
+}
