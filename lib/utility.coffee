@@ -27,8 +27,10 @@ buildRequestParameters = (filepath, contents, filetypes = [], bufferPosition = n
   filetypeMapper = (filetype) -> switch filetype
     when 'js' then 'javascript'
     else filetype
+  workingDir = atom.project.getPaths().find((directory) -> filepath.startsWith directory) or path.dirname filepath
   parameters =
     filepath: filepath
+    working_dir: workingDir
     line_num: bufferPosition.row + 1
     column_num: bufferPosition.column + 1
     file_data: {}
