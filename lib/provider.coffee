@@ -1,7 +1,7 @@
 utility = require './utility'
 getCompletions = require './get-completions'
 getIssues = require './get-issues'
-menu = require './menu'
+command = require './command'
 
 module.exports =
   selector: '*'
@@ -24,5 +24,5 @@ module.exports =
 
   getSuggestionForWord: (editor, text, range) ->
     return null unless utility.isEnabledForScope editor.getRootScopeDescriptor()
-    callback = -> menu.runCommand 'GoToImprecise'
+    callback = -> command.run 'GoTo'
     {range, callback}

@@ -12,7 +12,7 @@ commands =
   'clear-compilation-flag-cache': 'ClearCompilationFlagCache'
 contextMenu = null
 
-runCommand = (command) ->
+run = (command) ->
   Promise.resolve()
     .then utility.getEditorData
     .then ({filepath, contents, filetypes, bufferPosition}) ->
@@ -31,7 +31,7 @@ register = ->
   generatedMenus = []
   Object.keys(commands).forEach (key) ->
     command = commands[key]
-    generatedCommands["you-complete-me:#{key}"] = (event) -> runCommand(command).catch utility.notifyError()
+    generatedCommands["you-complete-me:#{key}"] = (event) -> run(command).catch utility.notifyError()
     generatedMenus.push command: "you-complete-me:#{key}", label: command
   atom.commands.add 'atom-text-editor', generatedCommands
   contextMenu = atom.contextMenu.add 'atom-text-editor': [label: 'YouCompleteMe', submenu: generatedMenus]
@@ -42,4 +42,4 @@ deregister = ->
 module.exports =
   register: register
   deregister: deregister
-  runCommand: runCommand
+  run: run

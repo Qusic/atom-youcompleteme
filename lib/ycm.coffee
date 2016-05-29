@@ -2,15 +2,15 @@ provider = require './provider'
 handler = require './handler'
 config = require './config'
 event = require './event'
-menu = require './menu'
+command = require './command'
 
 activate = ->
   event.register()
-  menu.register()
+  command.register()
 
 deactivate = ->
   event.deregister()
-  menu.deregister()
+  command.deregister()
   handler.reset()
 
 module.exports =
