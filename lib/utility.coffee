@@ -4,8 +4,11 @@ path = require 'path'
 
 getWorkingDirectory = ->
   projects = atom.project.getPaths()
-  activeFile = atom.workspace.getActiveTextEditor().getPath()
-  projects.find((project) -> activeFile.startsWith project) or projects[0] or atom.config.get 'core.projectHome'
+  activeFile = atom.workspace.getActiveTextEditor()?.getPath()
+  if activeFile?
+    projects.find((project) -> activeFile.startsWith project) or path.dirname activeFile
+  else
+    projects[0] or atom.config.get 'core.projectHome'
 
 getEditorTmpFilepath = (editor) ->
   return path.resolve os.tmpdir(), "AtomYcmBuffer-#{editor.getBuffer().getId()}"
