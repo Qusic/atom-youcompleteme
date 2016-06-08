@@ -14,10 +14,8 @@ fetchCompletions = ({editor, filepath, contents, filetypes, bufferPosition, pref
   lastPrefix = prefix
   parameters = utility.buildRequestParameters filepath, contents, filetypes, bufferPosition
   parameters.force_semantic = forceSemantic
-  #console.log parameters
   handler.request('POST', 'completions', parameters).then (response) ->
     completions = response?.completions or []
-    #console.log completions
     startColumn = (response?.completion_start_column or (bufferPosition.column + 1)) - 1
     prefix = editor.getTextInBufferRange [[bufferPosition.row, startColumn], bufferPosition]
     return {completions, prefix, filetypes}
