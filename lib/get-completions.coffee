@@ -49,15 +49,9 @@ convertCompletions = ({completions, prefix, filetypes}) ->
         else suggestion.type
       return suggestion
 
-    python: (completion) ->
-      suggestion = converters.general completion
-      suggestion.type = completion.display_string.substr(0, (completion.display_string.indexOf ': '))
-      return suggestion
-
   converter = converters[(
     switch filetypes[0]
       when 'c', 'cpp', 'objc', 'objcpp' then 'clang'
-      when 'python' then 'python'
       else 'general'
   )]
 
