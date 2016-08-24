@@ -22,6 +22,7 @@ module.exports =
     description: '
       An array of filetypes within we should provide completions and diagnostics.
       They are equivalent to file extensions most of the time.
+      Use * if you want to enable all filetypes.
     '
   linterEnabled:
     type: 'boolean'
