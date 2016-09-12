@@ -44,6 +44,7 @@ buildRequestParameters = (filepath, contents, filetypes = [], bufferPosition = n
     line_num: bufferPosition.row + 1
     column_num: bufferPosition.column + 1
     file_data: {}
+    tag_files: ['.tags', 'tags'].map (t) -> path.join(workingDir, t)
   parameters.file_data[filepath] = {contents, filetypes: convertFiletypes filetypes}
   atom.workspace.getTextEditors()
     .filter (editor) ->
