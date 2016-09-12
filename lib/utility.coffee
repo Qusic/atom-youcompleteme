@@ -35,6 +35,7 @@ buildRequestParameters = (filepath, contents, filetypes = [], bufferPosition = n
   convertFiletypes = (filetypes) ->
     filetypes.map((filetype) -> switch filetype
       when 'js', 'jsx' then 'javascript'
+      when 'ahk' then 'autohotkey'
       else filetype
     ).filter (filetype, index, filetypes) -> filetypes.indexOf(filetype) is index
   workingDir = getWorkingDirectory()
