@@ -33,8 +33,11 @@ launch = (exit) ->
         reject error
 
   readDefaultOptions = new Promise (fulfill, reject) ->
-    defaultOptionsFile = path.resolve atom.config.get('you-complete-me.ycmdPath'), 'ycmd', 'default_settings.json'
-    fs.readFile defaultOptionsFile, encoding: 'utf8', (error, data) ->
+    customOptionsFile = path.resolve atom.config.get('you-complete-me.ycmdSettingPath')
+    fs.exists customOptionsFile, (exists) ->
+      unless exists?
+        customOptionsFile = path.resolve atom.config.get('you-complete-me.ycmdPath'), 'ycmd', 'default_settings.json'
+    fs.readFile customOptionsFile, encoding: 'utf8', (error, data) ->
       unless error?
         fulfill JSON.parse data
       else
