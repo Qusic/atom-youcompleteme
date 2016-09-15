@@ -10,10 +10,9 @@ url = require 'url'
 
 utility = require './utility'
 
-workingDirectory = null
-ycmdProcess = null
+ycmd = null
 port = null
-hmacSecret = null
+secret = null
 
 launch = (exit) ->
   findUnusedPort = new Promise (fulfill, reject) ->
@@ -42,8 +41,8 @@ launch = (exit) ->
 
   processData = ([unusedPort, randomSecret, options]) -> new Promise (fulfill, reject) ->
     port = unusedPort
-    hmacSecret = randomSecret
-    options.hmac_secret = hmacSecret.toString 'base64'
+    secret = randomSecret
+    options.hmac_secret = secret.toString 'base64'
     options[theirKey] = atom.config.get "you-complete-me.#{ourKey}" for theirKey, ourKey of {
       'global_ycm_extra_conf': 'globalExtraConfig'
       'confirm_extra_conf': 'confirmExtraConfig'
@@ -58,7 +57,6 @@ launch = (exit) ->
         reject error
 
   startServer = (optionsFile) -> new Promise (fulfill, reject) ->
-    workingDirectory = utility.getWorkingDirectory()
     process = new BufferedProcess
       command: atom.config.get 'you-complete-me.pythonExecutable'
       args: [
@@ -67,11 +65,13 @@ launch = (exit) ->
         "--options_file=#{optionsFile}"
         '--idle_suicide_seconds=600'
       ]
-      options: cwd: workingDirectory
+      options: cwd: atom.config.get 'core.projectHome'
       stdout: (output) -> utility.debugLog 'CONSOLE', output
       stderr: (output) -> utility.debugLog 'CONSOLE', output
       exit: (code) ->
-        exit()
+        port = null
+        secret = null
+        exit?()
         switch code
           when 3 then reject new Error 'Unexpected error while loading the YCM core library.'
           when 4 then reject new Error 'YCM core library not detected; you need to compile YCM before using it. Follow the instructions in the documentation.'
@@ -85,22 +85,18 @@ launch = (exit) ->
     .then startServer
 
 prepare = ->
-  Promise.resolve()
-    .then -> reset() if workingDirectory isnt utility.getWorkingDirectory()
-    .then -> ycmdProcess ?= launch -> ycmdProcess = null
+  ycmd = Promise.resolve ycmd
+    .catch (error) -> null
+    .then (process) -> process or launch reset
 
 reset = ->
-  realReset = (process) ->
-    process?.kill?()
-    ycmdProcess = null
-    port = null
-    hmacSecret = null
-  Promise.resolve ycmdProcess
-    .then realReset, realReset
+  ycmd = Promise.resolve ycmd
+    .catch (error) -> null
+    .then (process) -> process?.kill()
 
 request = (method, endpoint, parameters = null) -> prepare().then ->
   generateHmac = (data, encoding) ->
-    crypto.createHmac('sha256', hmacSecret).update(data).digest(encoding)
+    crypto.createHmac('sha256', secret).update(data).digest(encoding)
 
   verifyHmac = (data, hmac, encoding) ->
     secureCompare generateHmac(data, encoding), hmac
