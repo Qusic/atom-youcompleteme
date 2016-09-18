@@ -21,8 +21,8 @@ fetchCompletions = ({editor, filepath, contents, filetypes, bufferPosition, pref
     return {completions, prefix, filetypes}
 
 convertCompletions = ({completions, prefix, filetypes}) ->
-  converters =
-    general: (completion) ->
+  converter = (filetype) ->
+    general = (completion) ->
       suggestion =
         text: completion.insertion_text
         replacementPrefix: prefix
@@ -35,8 +35,8 @@ convertCompletions = ({completions, prefix, filetypes}) ->
         else null
       return suggestion
 
-    clang: (completion) ->
-      suggestion = converters.general completion
+    clang = (completion) ->
+      suggestion = general completion
       suggestion.type = switch completion.kind
         when 'TYPE', 'STRUCT', 'ENUM' then 'type'
         when 'CLASS' then 'class'
@@ -49,13 +49,11 @@ convertCompletions = ({completions, prefix, filetypes}) ->
         else suggestion.type
       return suggestion
 
-  converter = converters[(
-    switch filetypes[0]
-      when 'c', 'cpp', 'objc', 'objcpp' then 'clang'
-      else 'general'
-  )]
+    switch filetype
+      when 'c', 'cpp', 'objc', 'objcpp' then clang
+      else general
 
-  completions.map converter
+  completions.map converter filetypes[0]
 
 getCompletions = (context) ->
   Promise.resolve context
