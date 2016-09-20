@@ -8,7 +8,7 @@ getWorkingDirectory = ->
   if activeFile?
     projects.find((project) -> activeFile.startsWith project) or path.dirname activeFile
   else
-    projects[0]
+    projects[0] or atom.config.get 'core.projectHome'
 
 getEditorTmpFilepath = (editor) ->
   return path.resolve os.tmpdir(), "AtomYcmBuffer-#{editor.getBuffer().getId()}"

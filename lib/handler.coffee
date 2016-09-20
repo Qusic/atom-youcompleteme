@@ -13,6 +13,7 @@ utility = require './utility'
 ycmd = null
 port = null
 secret = null
+cwd = null
 
 launch = (exit) ->
   findUnusedPort = new Promise (fulfill, reject) ->
@@ -57,6 +58,7 @@ launch = (exit) ->
         reject error
 
   startServer = (optionsFile) -> new Promise (fulfill, reject) ->
+    cwd = utility.getWorkingDirectory()
     process = new BufferedProcess
       command: atom.config.get 'you-complete-me.pythonExecutable'
       args: [
@@ -65,7 +67,7 @@ launch = (exit) ->
         "--options_file=#{optionsFile}"
         '--idle_suicide_seconds=600'
       ]
-      options: cwd: atom.config.get 'core.projectHome'
+      options: cwd: cwd
       stdout: (output) -> utility.debugLog 'CONSOLE', output
       stderr: (output) -> utility.debugLog 'CONSOLE', output
       exit: (code) ->
@@ -87,6 +89,7 @@ launch = (exit) ->
 prepare = ->
   ycmd = Promise.resolve ycmd
     .catch (error) -> null
+    .then (process) -> if cwd is utility.getWorkingDirectory() then process else process?.kill()
     .then (process) -> process or launch reset
 
 reset = ->
