@@ -4,15 +4,16 @@
 
 ## Previews
 
-![](https://cloud.githubusercontent.com/assets/2141853/7626423/79024212-fa3b-11e4-941e-e014a8e5b0df.gif)
-![](https://cloud.githubusercontent.com/assets/2141853/7626422/7901f352-fa3b-11e4-8007-82ab514fb8e9.gif)
+![](https://cloud.githubusercontent.com/assets/2141853/18661117/ce2259ee-7f46-11e6-908f-50b52e121dc8.png)
+![](https://cloud.githubusercontent.com/assets/2141853/18661116/cdcdf7a0-7f46-11e6-80ce-62aa042a5ef0.png)
 
 ## Features
 
-* Semantic code completion using [autocomplete+](https://github.com/atom-community/autocomplete-plus)
-* Diagnostic display using [linter](https://github.com/atom-community/linter)
+* Semantic code completion using [autocomplete+](https://atom.io/packages/autocomplete-plus)
+* Diagnostic display using [linter](https://atom.io/packages/linter)
 * Commands and context menus to query the type of variables or methods
 * Commands and context menus to go to declaration or definition
+* Go to declaration or definition with mouse click using [hyperclick](https://atom.io/packages/hyperclick)
 
 ## Keymaps
 
