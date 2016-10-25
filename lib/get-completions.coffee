@@ -32,7 +32,7 @@ convertCompletions = ({completions, prefix, filetypes}) ->
         description: completion.detailed_info
       suggestion.type = switch completion.extra_menu_info
         when '[File]', '[Dir]', '[File&Dir]' then 'import'
-        when '[ID]' then 'keyword'
+        when '[ID]' then 'tag'
         else null
       return suggestion
 
