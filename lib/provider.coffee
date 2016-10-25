@@ -5,8 +5,8 @@ command = require './command'
 
 module.exports =
   selector: '*'
-  inclusionPriority: 2
-  suggestionPriority: 2
+  inclusionPriority: 0
+  suggestionPriority: 1
   excludeLowerPriority: false
 
   grammarScopes: ['*']
