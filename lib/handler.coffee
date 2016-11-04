@@ -77,8 +77,8 @@ launch = (exit) ->
         switch code
           when 3 then reject new Error 'Unexpected error while loading the YCM core library.'
           when 4 then reject new Error 'YCM core library not detected; you need to compile YCM before using it. Follow the instructions in the documentation.'
-          when 5 then reject new Error 'YCM core library compiled for Python 3 but loaded in Python 2. Set the Python Executable config to a Python 3 interpreter path.'
-          when 6 then reject new Error 'YCM core library compiled for Python 2 but loaded in Python 3. Set the Python Executable config to a Python 2 interpreter path.'
+          when 5 then reject new Error 'YCM core library compiled for Python 2 but loaded in Python 3. Set the Python Executable config to a Python 2 interpreter path.'
+          when 6 then reject new Error 'YCM core library compiled for Python 3 but loaded in Python 2. Set the Python Executable config to a Python 3 interpreter path.'
           when 7 then reject new Error 'YCM core library too old; PLEASE RECOMPILE by running the install.py script. See the documentation for more details.'
     setTimeout (-> fulfill process), 1000
 
