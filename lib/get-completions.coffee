@@ -27,11 +27,12 @@ convertCompletions = ({completions, prefix, filetypes}) ->
         text: completion.insertion_text
         replacementPrefix: prefix
         displayText: completion.menu_text
-        leftLabel: completion.extra_menu_info
+        leftLabel: completion.extra_menu_info.replace(/(^\[|\]$)/g, '')
         rightLabel: completion.kind
         description: completion.detailed_info
-      suggestion.type = switch completion.kind
+      suggestion.type = switch completion.extra_menu_info
         when '[File]', '[Dir]', '[File&Dir]' then 'import'
+        when '[ID]' then 'tag'
         else null
       return suggestion
 
