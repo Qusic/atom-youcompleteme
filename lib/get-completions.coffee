@@ -20,11 +20,38 @@ fetchCompletions = ({editor, filepath, contents, filetypes, bufferPosition, pref
     prefix = editor.getTextInBufferRange [[bufferPosition.row, startColumn], bufferPosition]
     return {completions, prefix, filetypes}
 
+getSnippet = (completion) ->
+    snippet = switch completion.kind
+        when 'FUNCTION' then funcSnippet(completion)
+        when 'MACRO' then macroSnippet(completion)
+        else completion.insertion_text
+    return snippet
+
+funcSnippet = (completion) ->
+    args = /\(\s*([^)]+?)\s*\)/.exec(completion.detailed_info)
+    if (args) then arg = args[1].split(/\s*,\s*/)
+    else arg = []
+    snippet = "#{completion.insertion_text}("
+    pos = 0
+    for a in arg when pos < arg.length
+        pos++
+        snippet = snippet + "${#{pos}:#{a}}, "
+    if(arg.length) then snippet = snippet.substring(0,snippet.length-2)+")"
+    else snippet = snippet + ")"
+    return snippet
+
+macroSnippet = (completion) ->
+    args = /\(.*\)/.exec(completion.detailed_info)
+    if(args) then snippet = funcSnippet completion
+    else snippet = "#{completion.insertion_text}"
+    return snippet
+
 convertCompletions = ({completions, prefix, filetypes}) ->
   converter = (filetype) ->
     general = (completion) ->
       suggestion =
         text: completion.insertion_text
+        snippet: getSnippet completion
         replacementPrefix: prefix
         displayText: completion.menu_text
         leftLabel: completion.extra_menu_info
