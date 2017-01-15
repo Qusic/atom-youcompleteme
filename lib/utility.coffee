@@ -69,6 +69,13 @@ notifyError = (result) -> (error) ->
 debugLog = (category, message...) ->
   console.debug "[YCM-#{category}]", message... if atom.inDevMode()
 
+expandYcmdPath = (ycmdPath) ->
+  if ycmdPath.substr(0, 1) is '~'
+    home = homedir()
+    path.resolve homedir(), ycmdPath.slice(1)
+  else
+    ycmdPath
+
 module.exports = {
   getWorkingDirectory
   getEditorTmpFilepath
@@ -78,4 +85,5 @@ module.exports = {
   isEnabledForScope
   notifyError
   debugLog
+  expandYcmdPath
 }
