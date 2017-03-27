@@ -9,9 +9,10 @@ module.exports =
   suggestionPriority: 2
   excludeLowerPriority: false
 
+  name: 'YouCompleteMe'
   grammarScopes: ['*']
   scope: 'file'
-  lintOnFly: true
+  lintsOnChange: true
 
   getSuggestions: (context) ->
     return [] unless utility.isEnabledForScope context.editor.getRootScopeDescriptor()
