@@ -10,7 +10,7 @@
 ## Features
 
 * Semantic code completion using [autocomplete+](https://atom.io/packages/autocomplete-plus)
-* Diagnostic display using [linter](https://atom.io/packages/linter)
+* Diagnostic display and quick fix using [linter](https://atom.io/packages/linter)
 * Commands and context menus to query the type of variables or methods
 * Commands and context menus to go to declaration or definition
 * Go to declaration or definition with mouse click using [hyperclick](https://atom.io/packages/hyperclick)
