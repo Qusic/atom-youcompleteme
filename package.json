@@ -4,13 +4,23 @@
   "description": "YouCompleteMe for Atom Editor",
   "repository": "https://github.com/Qusic/atom-youcompleteme",
   "license": "MIT",
-  "keywords": ["autocomplete", "linter"],
+  "keywords": [
+    "autocomplete",
+    "linter"
+  ],
   "main": "./lib/ycm",
   "engines": {
     "atom": ">=1.14.0 <2.0.0"
   },
-  "dependencies": {},
+  "dependencies": {
+    "atom-package-deps": "^4.5.0"
+  },
   "devDependencies": {},
+  "package-deps": [
+    "autocomplete-plus",
+    "linter",
+    "hyperclick"
+  ],
   "providedServices": {
     "autocomplete.provider": {
       "versions": {

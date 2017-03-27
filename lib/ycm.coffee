@@ -1,3 +1,5 @@
+{install} = require 'atom-package-deps'
+
 provider = require './provider'
 handler = require './handler'
 config = require './config'
@@ -5,6 +7,7 @@ event = require './event'
 command = require './command'
 
 activate = ->
+  install('you-complete-me', true)
   event.register()
   command.register()
 
