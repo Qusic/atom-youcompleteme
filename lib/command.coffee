@@ -8,7 +8,6 @@ commands =
   'go-to-definition': 'GoToDefinition'
   'go-to': 'GoTo'
   'go-to-imprecise': 'GoToImprecise'
-  #'fix-it': 'FixIt' # TODO
   'clear-compilation-flag-cache': 'ClearCompilationFlagCache'
 contextMenu = null
 
@@ -25,6 +24,8 @@ run = (command, position) ->
         else if command.startsWith 'GoTo'
           if response?.filepath?
             atom.workspace.open response.filepath, initialLine: response.line_num - 1, initialColumn: response.column_num - 1
+        else
+          response
 
 register = ->
   generatedCommands = {}
