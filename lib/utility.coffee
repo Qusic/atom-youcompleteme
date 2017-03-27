@@ -31,12 +31,13 @@ getEditorData = (editor = atom.workspace.getActiveTextEditor()) ->
 getScopeFiletypes = (scopeDescriptor = atom.workspace.getActiveTextEditor().getRootScopeDescriptor()) ->
   return scopeDescriptor.getScopesArray().map (scope) -> scope.split('.').pop()
 
-buildRequestParameters = (filepath, contents, filetypes = [], bufferPosition = new Point(0, 0)) ->
+buildRequestParameters = (filepath, contents, filetypes = [], bufferPosition = [0, 0]) ->
   convertFiletypes = (filetypes) ->
     filetypes.map((filetype) -> switch filetype
       when 'js', 'jsx' then 'javascript'
       else filetype
     ).filter (filetype, index, filetypes) -> filetypes.indexOf(filetype) is index
+  bufferPosition = Point.fromObject(bufferPosition)
   workingDir = getWorkingDirectory()
   parameters =
     filepath: filepath
