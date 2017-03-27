@@ -1,12 +1,13 @@
 {
   "name": "you-complete-me",
-  "main": "./lib/ycm",
   "version": "0.7.11",
   "description": "YouCompleteMe for Atom Editor",
   "repository": "https://github.com/Qusic/atom-youcompleteme",
   "license": "MIT",
+  "keywords": ["autocomplete", "linter"],
+  "main": "./lib/ycm",
   "engines": {
-    "atom": ">=0.177.0"
+    "atom": ">=1.14.0 <2.0.0"
   },
   "dependencies": {},
   "devDependencies": {},
@@ -18,7 +19,7 @@
     },
     "linter": {
       "versions": {
-        "1.0.0": "provideLinter"
+        "2.0.0": "provideLinter"
       }
     },
     "hyperclick.provider": {
