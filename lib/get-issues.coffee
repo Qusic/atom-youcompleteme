@@ -11,7 +11,7 @@ fetchIssues = ({filepath, contents, filetypes}) ->
   parameters.event_name = 'FileReadyToParse'
   handler.request('POST', 'event_notification', parameters).then (response) ->
     Promise.resolve if Array.isArray response then response else []
-      .then (issues) -> Promise.all issues.map (issue) ->
+      .then (issues) -> (Promise.all issues.map (issue) ->
         if issue.fixit_available
           command.run('FixIt', [issue.location.line_num - 1, issue.location.column_num - 1]).then (response) ->
             issue.fixits = if Array.isArray response?.fixits then response.fixits else []
@@ -19,7 +19,7 @@ fetchIssues = ({filepath, contents, filetypes}) ->
         else
           issue.fixits = []
           Promise.resolve issue
-      .then (issues) -> {issues, filetypes}
+      ).then (issues) -> {issues, filetypes}
 
 convertIssues = ({issues, filetypes}) ->
   converter = (filetype) ->
