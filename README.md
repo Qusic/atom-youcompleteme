@@ -30,4 +30,4 @@
 * Configure the path to your python executable and ycmd installation.  
   For detailed instructions and troubleshooting on building ycmd, see [ycmd's README](https://github.com/Valloric/ycmd#building).
 * By default this package is enabled for C/C++/Objective-C/Objective-C++ only.  
-  You can enable it for other filetypes that YouCompleteMe supports.
+  You can enable other filetypes supported by YouCompleteMe in settings.
