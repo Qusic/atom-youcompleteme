@@ -11,14 +11,21 @@ module.exports =
     default: '/usr/lib/youcompleteme/third_party/ycmd'
     order: 2
     description: '
-      The directory containing the `ycmd/default_settings.json` file.
+      The path to your ycmd installation. Must contain the `ycmd/__main__.py` file.
       [Ycmd](https://github.com/Valloric/ycmd) is required for this plugin to work.
+    '
+  defaultSettingsPath:
+    type: 'string'
+    default: ''
+    order: 3
+    description: '
+      If empty, defaults to the `ycmd/default_settings.json` file within the Ycmd path.
     '
   enabledFiletypes:
     type: 'array'
     items: type: 'string'
     default: ['c', 'cpp', 'objc', 'objcpp']
-    order: 3
+    order: 4
     description: '
       An array of filetypes within we should provide completions and diagnostics.
       They are equivalent to file extensions most of the time.
@@ -26,14 +33,14 @@ module.exports =
   linterEnabled:
     type: 'boolean'
     default: true
-    order: 4
+    order: 5
     description: '
       Disable linter if you do not need those diagnostic messages.
     '
   globalExtraConfig:
     type: 'string'
     default: ''
-    order: 5
+    order: 6
     description: '
       The fallback extra config file when no `.ycm_extra_conf.py` is found.
       Follow [this link](https://github.com/Valloric/YouCompleteMe#the-gycm_global_ycm_extra_conf-option) for more information.
@@ -41,7 +48,7 @@ module.exports =
   confirmExtraConfig:
     type: 'boolean'
     default: true
-    order: 6
+    order: 7
     description: '
       Whether to ask once before loading an extra config file for safety reason.
       To selectively whitelist or blacklist them, use **Extra Config Globlist** option.
@@ -51,7 +58,7 @@ module.exports =
     type: 'array'
     items: type: 'string'
     default: []
-    order: 7
+    order: 8
     description: '
       Extra config files whitelist and blacklist,
       e.g. `~/dev/*, !~/*` would make it load all `.ycm_extra_conf.py` under `~/dev/` and not to load all other `.ycm_extra_conf.py` under `~/`, without confirmation.
@@ -60,7 +67,7 @@ module.exports =
   rustSrcPath:
     type: 'string'
     default: ''
-    order: 8
+    order: 9
     description: '
       The directory containing the [Rust source code](https://github.com/rust-lang/rust).
       You have also to to add `rust` in **Enabled Filetypes**.
