@@ -1,14 +1,13 @@
 {
-  "name": "you-complete-me",
-  "version": "0.8.1",
-  "description": "YouCompleteMe for Atom Editor",
-  "repository": "https://github.com/Qusic/atom-youcompleteme",
+  "name": "TabNine",
+  "version": "0.0.0",
+  "description": "TabNine for Atom",
+  "repository": "https://github.com/zxqfl/tabnine-atom",
   "license": "MIT",
   "keywords": [
-    "autocomplete",
-    "linter"
+    "autocomplete"
   ],
-  "main": "./lib/ycm",
+  "main": "./lib/tabnine",
   "engines": {
     "atom": ">=1.14.0 <2.0.0"
   },
@@ -17,24 +16,12 @@
   },
   "devDependencies": {},
   "package-deps": [
-    "autocomplete-plus",
-    "linter",
-    "hyperclick"
+    "autocomplete-plus"
   ],
   "providedServices": {
     "autocomplete.provider": {
       "versions": {
         "2.0.0": "provide"
-      }
-    },
-    "linter": {
-      "versions": {
-        "2.0.0": "provideLinter"
-      }
-    },
-    "hyperclick.provider": {
-      "versions": {
-        "0.0.0": "provideHyperclick"
       }
     }
   }

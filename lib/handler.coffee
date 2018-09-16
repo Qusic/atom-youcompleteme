@@ -5,12 +5,14 @@ net = require 'net'
 os = require 'os'
 path = require 'path'
 querystring = require 'querystring'
+process = require 'process'
 url = require 'url'
+semver = require 'semver'
 {BufferedProcess} = require 'atom'
 
 utility = require './utility'
 
-ycmd = null
+tabnine = null
 port = null
 secret = null
 cwd = null
@@ -32,43 +34,28 @@ launch = (exit) ->
       else
         reject error
 
-  readDefaultOptions = new Promise (fulfill, reject) ->
-    defaultOptionsFile = atom.config.get('you-complete-me.defaultSettingsPath')
-    if defaultOptionsFile is ''
-      defaultOptionsFile = path.resolve atom.config.get('you-complete-me.ycmdPath'), 'ycmd', 'default_settings.json'
-    fs.readFile defaultOptionsFile, encoding: 'utf8', (error, data) ->
-      unless error?
-        fulfill JSON.parse data
-      else
-        reject error
-
-  processData = ([unusedPort, randomSecret, options]) -> new Promise (fulfill, reject) ->
+  processData = ([unusedPort, randomSecret]) -> new Promise (fulfill, reject) ->
     port = unusedPort
     secret = randomSecret
-    options.hmac_secret = secret.toString 'base64'
-    options[theirKey] = atom.config.get "you-complete-me.#{ourKey}" for theirKey, ourKey of {
-      'global_ycm_extra_conf': 'globalExtraConfig'
-      'confirm_extra_conf': 'confirmExtraConfig'
-      'extra_conf_globlist': 'extraConfigGloblist'
-      'rust_src_path': 'rustSrcPath'
-    }
-    optionsFile = path.resolve os.tmpdir(), "AtomYcmOptions-#{Date.now()}"
+    options = { 'hmac_secret': secret.toString 'base64' }
+    optionsFile = path.resolve os.tmpdir(), "HmacSecret-#{Date.now()}"
     fs.writeFile optionsFile, JSON.stringify(options), encoding: 'utf8', (error) ->
       unless error?
         fulfill optionsFile
       else
         reject error
-
   startServer = (optionsFile) -> new Promise (fulfill, reject) ->
     cwd = utility.getWorkingDirectory()
+    args = [
+      "--port=#{port}"
+      "--options_file=#{optionsFile}"
+      '--idle_suicide_seconds=600'
+    ]
+    binary_root = path.join(__dirname, "..", "binaries")
+    command = getBinaryPath(binary_root)
     process = new BufferedProcess
-      command: atom.config.get 'you-complete-me.pythonExecutable'
-      args: [
-        path.resolve atom.config.get('you-complete-me.ycmdPath'), 'ycmd'
-        "--port=#{port}"
-        "--options_file=#{optionsFile}"
-        '--idle_suicide_seconds=600'
-      ]
+      command: command
+      args: args
       options: cwd: cwd
       stdout: (output) -> utility.debugLog 'CONSOLE', output
       stderr: (output) -> utility.debugLog 'CONSOLE', output
@@ -76,26 +63,20 @@ launch = (exit) ->
         port = null
         secret = null
         exit?()
-        switch code
-          when 3 then reject new Error 'Unexpected error while loading the YCM core library.'
-          when 4 then reject new Error 'YCM core library not detected; you need to compile YCM before using it. Follow the instructions in the documentation.'
-          when 5 then reject new Error 'YCM core library compiled for Python 2 but loaded in Python 3. Set the Python Executable config to a Python 2 interpreter path.'
-          when 6 then reject new Error 'YCM core library compiled for Python 3 but loaded in Python 2. Set the Python Executable config to a Python 3 interpreter path.'
-          when 7 then reject new Error 'YCM core library too old; PLEASE RECOMPILE by running the install.py script. See the documentation for more details.'
     setTimeout (-> fulfill process), 1000
 
-  Promise.all [findUnusedPort, generateRandomSecret, readDefaultOptions]
+  Promise.all [findUnusedPort, generateRandomSecret]
     .then processData
     .then startServer
 
 prepare = ->
-  ycmd = Promise.resolve ycmd
+  tabnine = Promise.resolve tabnine
     .catch (error) -> null
     .then (process) -> if cwd is utility.getWorkingDirectory() then process else process?.kill()
     .then (process) -> process or launch reset
 
 reset = ->
-  ycmd = Promise.resolve ycmd
+  tabnine = Promise.resolve tabnine
     .catch (error) -> null
     .then (process) -> process?.kill()
 
@@ -127,13 +108,13 @@ request = (method, endpoint, parameters = null) -> prepare().then ->
 
   handleException = (response) ->
     notifyException = ->
-      atom.notifications.addWarning "[YCM] #{response.exception.TYPE}", detail: "#{response.message}\n#{response.traceback}"
+      atom.notifications.addWarning "[TabNine] #{response.exception.TYPE}", detail: "#{response.message}\n#{response.traceback}"
 
     confirmExtraConfig = ->
       filepath = response.exception.extra_conf_file
       message = response.message
       atom.confirm
-        message: '[YCM] Unknown Extra Config'
+        message: '[TabNine] Unknown Extra Config'
         detailedMessage: message
         buttons:
           Load: -> request('POST', 'load_extra_conf_file', {filepath}).catch utility.notifyError()
@@ -183,6 +164,40 @@ request = (method, endpoint, parameters = null) -> prepare().then ->
       requestHandler.on 'error', (error) -> reject error
       requestHandler.write requestPayload if isPost
       requestHandler.end()
+
+getBinaryPath = (root) ->
+  arch = switch process.arch
+    when 'x32' then 'i686'
+    when 'x64' then 'x86_64'
+    else throw new Error("Sorry, the architecture `#{process.arch}` is not supported by TabNine.")
+  suffix = switch process.platform
+    when 'win32' then 'pc-windows-gnu/TabNine.exe'
+    when 'darwin' then 'apple-darwin/TabNine'
+    when 'linux' then 'unknown-linux-gnu/TabNine'
+    else throw new Error("Sorry, the platform `#{process.platform}` is not supported by TabNine.")
+  versions = fs.readdirSync(root)
+  versions = sortBySemver(versions)
+  tried = []
+  for version in versions
+    full_path = "#{root}/#{version}/#{arch}-#{suffix}"
+    tried.push(full_path)
+    if fs.existsSync(full_path)
+      return full_path
+  throw new Error("Couldn't find a TabNine binary (tried the following paths: #{tried})")
+
+sortBySemver = (versions) ->
+  cmp = (a, b) ->
+    a_valid = semver.valid(a)
+    b_valid = semver.valid(b)
+    switch
+      when a_valid && b_valid then semver.rcompare(a, b)
+      when a_valid then -1
+      when b_valid then 1
+      when a < b then -1
+      when a > b then 1
+      else 0
+  versions.sort(cmp)
+  versions
 
 module.exports = {
   prepare

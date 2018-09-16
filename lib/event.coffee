@@ -21,7 +21,7 @@ observeEditors = ->
     onBufferUnload = -> emitEvent editor, 'BufferUnload', unloaded_buffer: path
     onInsertLeave = -> emitEvent editor, 'InsertLeave'
     onCurrentIdentifierFinished = -> emitEvent editor, 'CurrentIdentifierFinished'
-    onFileReadyToParse = -> emitEvent editor, 'FileReadyToParse' unless atom.config.get 'you-complete-me.linterEnabled'
+    onFileReadyToParse = -> emitEvent editor, 'FileReadyToParse'
 
     observers = new CompositeDisposable()
     observers.add editor.observeGrammar ->
@@ -49,7 +49,7 @@ observeEditors = ->
       observers.dispose()
 
 observeConfig = ->
-  atom.config.observe 'you-complete-me', (value) ->
+  atom.config.observe 'TabNine', (value) ->
     handler.reset()
 
 register = ->

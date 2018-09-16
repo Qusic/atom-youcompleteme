@@ -58,17 +58,14 @@ buildRequestParameters = (filepath, contents, filetypes = [], bufferPosition = [
   return parameters
 
 isEnabledForScope = (scopeDescriptor) ->
-  enabledFiletypes = atom.config.get 'you-complete-me.enabledFiletypes'
-  filetypes = getScopeFiletypes scopeDescriptor
-  filetype = filetypes.find (filetype) -> enabledFiletypes.indexOf(filetype) >= 0
-  return if filetype? then true else false
+  return true
 
 notifyError = (result) -> (error) ->
-  atom.notifications.addError "[YCM] #{error.name}", detail: "#{error.stack}"
+  atom.notifications.addError "[TabNine] #{error.name}", detail: "#{error.stack}"
   result
 
 debugLog = (category, message...) ->
-  console.debug "[YCM-#{category}]", message... if atom.inDevMode()
+  console.debug "[TabNine-#{category}]", message... if atom.inDevMode()
 
 module.exports = {
   getWorkingDirectory
