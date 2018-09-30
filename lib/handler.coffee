@@ -15,7 +15,6 @@ utility = require './utility'
 tabnine = null
 port = null
 secret = null
-cwd = null
 
 launch = (exit) ->
   findUnusedPort = new Promise (fulfill, reject) ->
@@ -45,7 +44,6 @@ launch = (exit) ->
       else
         reject error
   startServer = (optionsFile) -> new Promise (fulfill, reject) ->
-    cwd = utility.getWorkingDirectory()
     args = [
       "--port=#{port}"
       "--options_file=#{optionsFile}"
@@ -56,7 +54,6 @@ launch = (exit) ->
     process = new BufferedProcess
       command: command
       args: args
-      options: cwd: cwd
       stdout: (output) -> utility.debugLog 'CONSOLE', output
       stderr: (output) -> utility.debugLog 'CONSOLE', output
       exit: (code) ->
@@ -72,7 +69,6 @@ launch = (exit) ->
 prepare = ->
   tabnine = Promise.resolve tabnine
     .catch (error) -> null
-    .then (process) -> if cwd is utility.getWorkingDirectory() then process else process?.kill()
     .then (process) -> process or launch reset
 
 reset = ->
