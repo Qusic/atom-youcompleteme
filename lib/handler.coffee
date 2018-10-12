@@ -164,8 +164,7 @@ request = (method, endpoint, parameters = null) -> prepare().then ->
 getBinaryPath = (root) ->
   arch = switch process.arch
     when 'x32' then 'i686'
-    when 'x64' then 'x86_64'
-    else throw new Error("Sorry, the architecture `#{process.arch}` is not supported by TabNine.")
+    else 'x86_64'
   suffix = switch process.platform
     when 'win32' then 'pc-windows-gnu/TabNine.exe'
     when 'darwin' then 'apple-darwin/TabNine'
