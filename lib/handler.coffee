@@ -165,7 +165,10 @@ getBinaryPath = (root) ->
   arch = switch process.arch
     when 'x32' then 'i686'
     else 'x86_64'
-  suffix = switch process.platform
+  platform = process.platform
+  if platform == undefined
+    platform = adHocGuessPlatform()
+  suffix = switch platform
     when 'win32' then 'pc-windows-gnu/TabNine.exe'
     when 'darwin' then 'apple-darwin/TabNine'
     when 'linux' then 'unknown-linux-gnu/TabNine'
@@ -179,6 +182,12 @@ getBinaryPath = (root) ->
     if fs.existsSync(full_path)
       return full_path
   throw new Error("Couldn't find a TabNine binary (tried the following paths: #{tried})")
+
+adHocGuessPlatform = () ->
+  switch
+    when fs.existsSync '/Applications' then 'darwin'
+    when fs.existsSync '/home' then 'linux'
+    else 'win32'
 
 sortBySemver = (versions) ->
   cmp = (a, b) ->

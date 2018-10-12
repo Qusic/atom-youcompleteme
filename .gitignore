@@ -6,4 +6,6 @@ sig
 auth
 registration_key
 
+binaries/*
+
 package-lock.json
