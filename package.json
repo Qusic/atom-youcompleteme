@@ -1,6 +1,6 @@
 {
   "name": "TabNine",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "The all-language autocompleter",
   "repository": "https://github.com/zxqfl/tabnine-atom",
   "license": "MIT",
