@@ -92,7 +92,10 @@ request = (method, endpoint, parameters = null) -> prepare().then ->
     message.headers['X-Ycm-Hmac'] = generateHmac Buffer.concat([generateHmac(message.method), generateHmac(message.path), generateHmac(payload)]), 'base64'
 
   verifyMessage = (message, payload) ->
-    verifyHmac payload, message.headers['x-ycm-hmac'], 'base64'
+    if payload.length == 0
+      true
+    else
+      verifyHmac payload, message.headers['x-ycm-hmac'], 'base64'
 
   escapeUnicode = (string) ->
     escapedString = ''
