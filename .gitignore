@@ -7,5 +7,6 @@ auth
 registration_key
 
 binaries/*
+!binaries/2.1.5
 
 package-lock.json
