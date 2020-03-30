@@ -174,7 +174,7 @@ getBinaryPath = (root) ->
   suffix = switch platform
     when 'win32' then 'pc-windows-gnu/TabNine.exe'
     when 'darwin' then 'apple-darwin/TabNine'
-    when 'linux' then 'unknown-linux-gnu/TabNine'
+    when 'linux' then 'unknown-linux-musl/TabNine'
     else throw new Error("Sorry, the platform `#{process.platform}` is not supported by TabNine.")
   versions = fs.readdirSync(root)
   versions = sortBySemver(versions)
