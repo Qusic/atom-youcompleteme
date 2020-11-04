@@ -45,6 +45,7 @@ launch = (exit) ->
         reject error
   startServer = (optionsFile) -> new Promise (fulfill, reject) ->
     args = [
+      "--client=atom"
       "--port=#{port}"
       "--options_file=#{optionsFile}"
       '--idle_suicide_seconds=600'
