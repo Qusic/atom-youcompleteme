@@ -21,6 +21,6 @@ jobs:
       - uses: codota/action-setup-atom@v1
         with:
           channel: stable
-      - run: apm publish -t ${{ steps.package-version.outputs.current-version }}
+      - run: apm publish -t ${{ format('v{0}', steps.package-version.outputs.current-version) }}
         env:
           ATOM_ACCESS_TOKEN: ${{secrets.ATOM_ACCESS_TOKEN}}
