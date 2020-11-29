@@ -1,3 +1,5 @@
+> I no longer use this extension and don't have plans for future updates. Please fork if you are interested in adding new features or maintaining this extension.
+
 # Atom YouCompleteMe package
 
 [YouCompleteMe](https://github.com/Valloric/YouCompleteMe) for Atom
